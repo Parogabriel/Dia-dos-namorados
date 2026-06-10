@@ -1332,6 +1332,7 @@
     let tx = 0, ty = 0;
     document.addEventListener('touchstart', e => { tx = e.changedTouches[0].screenX; ty = e.changedTouches[0].screenY; }, { passive: true });
     document.addEventListener('touchend', e => {
+      if (e.target.closest('#photoStack') || e.target.closest('#map') || e.target.closest('#wheelCanvas')) return;
       const dx = e.changedTouches[0].screenX - tx, dy = e.changedTouches[0].screenY - ty;
       if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy)) return;
       dx < 0 ? goTo(cur + 1) : goTo(cur - 1);
