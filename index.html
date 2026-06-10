@@ -38,7 +38,7 @@
       -webkit-font-smoothing: antialiased;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
-      overscroll-behavior-y: none;
+      overscroll-behavior: none;
     }
 
     .font-outfit {
@@ -931,8 +931,8 @@
       </div>
       <div class="flex items-center justify-center gap-6 w-full anim-fadeUp s4">
         <button class="pbtn">🔀</button><button class="pbtn" style="font-size:24px;">⏮</button>
-        <button class="play-btn" onclick="toggleAudio()"><span style="color:#000;font-size:24px;margin-left:2px;"
-            id="playIcon">▶</span></button>
+        <button class="play-btn" onclick="toggleAudio()"><span
+            id="playIcon"><svg width="28" height="28" viewBox="0 0 24 24" fill="black"><path d="M8 5v14l11-7z"/></svg></span></button>
         <button class="pbtn" style="font-size:24px;">⏭</button><button class="pbtn">🔁</button>
       </div>
       <button class="btn btn-g anim-fadeUp s5" onclick="goTo(1)" style="padding:10px 24px;border-radius:24px;">Sobre o
@@ -1355,9 +1355,11 @@
     // ===== AUDIO =====
     const audio = document.getElementById('audioPlayer');
     function toggleAudio() {
+      const pSvg = '<svg width="28" height="28" viewBox="0 0 24 24" fill="black"><path d="M8 5v14l11-7z"/></svg>';
+      const psSvg = '<svg width="28" height="28" viewBox="0 0 24 24" fill="black"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
       if (audio.paused) {
-        audio.play().then(() => { document.getElementById('playIcon').textContent = '⏸'; document.getElementById('floatAudio').classList.add('playing'); document.getElementById('floatAudio').textContent = '🎶'; }).catch(() => { });
-      } else { audio.pause(); document.getElementById('playIcon').textContent = '▶'; document.getElementById('floatAudio').classList.remove('playing'); document.getElementById('floatAudio').textContent = '🎵'; }
+        audio.play().then(() => { document.getElementById('playIcon').innerHTML = psSvg; document.getElementById('floatAudio').classList.add('playing'); }).catch(() => { });
+      } else { audio.pause(); document.getElementById('playIcon').innerHTML = pSvg; document.getElementById('floatAudio').classList.remove('playing'); }
     }
     audio.addEventListener('timeupdate', () => { if (audio.duration) { document.getElementById('progFill').style.width = (audio.currentTime / audio.duration) * 100 + '%'; const m = Math.floor(audio.currentTime / 60), s = Math.floor(audio.currentTime % 60); document.getElementById('curTime').textContent = m + ':' + (s < 10 ? '0' : '') + s; } });
     audio.addEventListener('ended', () => { audio.currentTime = 0; audio.play(); });
