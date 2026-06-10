@@ -1,220 +1,909 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Nossa História 💜</title>
   <meta name="description" content="Uma retrospectiva da nossa história de amor">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&family=Caveat:wght@400;600;700&display=swap"
+    rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      height: 100%; width: 100%; overflow: hidden;
-      background: #0a0a0a; color: #fff;
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: #0a0a0a;
+      color: #fff;
       font-family: 'Inter', sans-serif;
       -webkit-font-smoothing: antialiased;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
+      overscroll-behavior-y: none;
     }
-    .font-outfit { font-family: 'Outfit', sans-serif; }
-    .font-caveat { font-family: 'Caveat', cursive; }
+
+    .font-outfit {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .font-caveat {
+      font-family: 'Caveat', cursive;
+    }
 
     /* ===== SCREENS ===== */
     .screen {
-      position: fixed; inset: 0;
-      display: flex; flex-direction: column; align-items: center;
-      opacity: 0; pointer-events: none;
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
       transition: opacity 0.5s ease, transform 0.5s ease;
       transform: translateX(30px);
-      overflow-y: auto; overflow-x: hidden;
+      overflow-y: auto;
+      overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
     }
-    .screen.active { opacity: 1; pointer-events: auto; transform: translateX(0); z-index: 10; }
-    .screen.exiting { opacity: 0; transform: translateX(-30px); pointer-events: none; z-index: 5; }
-    .screen::-webkit-scrollbar { display: none; }
-    .screen { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .screen.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+      z-index: 10;
+    }
+
+    .screen.exiting {
+      opacity: 0;
+      transform: translateX(-30px);
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .screen::-webkit-scrollbar {
+      display: none;
+    }
+
+    .screen {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
 
     /* ===== DOTS ===== */
     .dots-container {
-      position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 4px; z-index: 100;
-      padding: 5px 10px; border-radius: 20px;
-      background: rgba(0,0,0,0.4); backdrop-filter: blur(10px);
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 4px;
+      z-index: 100;
+      padding: 5px 10px;
+      border-radius: 20px;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
     }
+
     .dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: rgba(255,255,255,0.2); transition: all 0.3s ease;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
     }
-    .dot.active { background: #1DB954; width: 18px; border-radius: 3px; }
+
+    .dot.active {
+      background: #1DB954;
+      width: 18px;
+      border-radius: 3px;
+    }
 
     /* ===== ANIMATIONS ===== */
-    @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes pulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.05); } }
-    @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-8px); } }
-    @keyframes twinkle { 0%,100% { opacity:0.3; } 50% { opacity:1; } }
-    @keyframes glow { 0%,100% { box-shadow: 0 0 20px rgba(29,185,84,0.2); } 50% { box-shadow: 0 0 40px rgba(29,185,84,0.5); } }
-    @keyframes holographic { 0% { background-position:0% 50%; } 50% { background-position:100% 50%; } 100% { background-position:0% 50%; } }
-    @keyframes confettiFall { 0% { transform:translateY(-10vh) rotate(0deg); opacity:1; } 100% { transform:translateY(110vh) rotate(720deg); opacity:0; } }
-    @keyframes constellationDraw { from { stroke-dashoffset:1000; } to { stroke-dashoffset:0; } }
-    @keyframes popIn { 0% { transform:scale(0) rotate(-10deg); opacity:0; } 70% { transform:scale(1.1) rotate(2deg); } 100% { transform:scale(1) rotate(0deg); opacity:1; } }
-    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
 
-    .anim-fadeUp { animation: fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) forwards; opacity:0; }
-    .s1{animation-delay:.1s}.s2{animation-delay:.2s}.s3{animation-delay:.35s}
-    .s4{animation-delay:.5s}.s5{animation-delay:.65s}.s6{animation-delay:.8s}.s7{animation-delay:.95s}
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    @keyframes twinkle {
+
+      0%,
+      100% {
+        opacity: 0.3;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes glow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 20px rgba(29, 185, 84, 0.2);
+      }
+
+      50% {
+        box-shadow: 0 0 40px rgba(29, 185, 84, 0.5);
+      }
+    }
+
+    @keyframes holographic {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(-10vh) rotate(0deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(110vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes constellationDraw {
+      from {
+        stroke-dashoffset: 1000;
+      }
+
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes popIn {
+      0% {
+        transform: scale(0) rotate(-10deg);
+        opacity: 0;
+      }
+
+      70% {
+        transform: scale(1.1) rotate(2deg);
+      }
+
+      100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0)
+      }
+
+      20% {
+        transform: translateX(-8px)
+      }
+
+      40% {
+        transform: translateX(8px)
+      }
+
+      60% {
+        transform: translateX(-5px)
+      }
+
+      80% {
+        transform: translateX(5px)
+      }
+    }
+
+    .anim-fadeUp {
+      animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+    }
+
+    .s1 {
+      animation-delay: .1s
+    }
+
+    .s2 {
+      animation-delay: .2s
+    }
+
+    .s3 {
+      animation-delay: .35s
+    }
+
+    .s4 {
+      animation-delay: .5s
+    }
+
+    .s5 {
+      animation-delay: .65s
+    }
+
+    .s6 {
+      animation-delay: .8s
+    }
+
+    .s7 {
+      animation-delay: .95s
+    }
 
     /* ===== PLAYER ===== */
-    .album-art { width:260px; height:260px; border-radius:8px; object-fit:cover; box-shadow:0 8px 40px rgba(0,0,0,0.5); }
-    .progress-bar-c { width:100%; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden; cursor:pointer; }
-    .progress-fill { height:100%; background:#1DB954; border-radius:2px; width:0%; transition:width 0.3s linear; }
-    .pbtn { background:none; border:none; color:rgba(255,255,255,0.6); font-size:20px; cursor:pointer; padding:8px; transition:color .2s,transform .15s; }
-    .pbtn:hover { color:#fff; } .pbtn:active { transform:scale(0.9); }
-    .play-btn {
-      width:56px; height:56px; border-radius:50%; background:#fff;
-      display:flex; align-items:center; justify-content:center;
-      border:none; cursor:pointer; box-shadow:0 4px 16px rgba(0,0,0,0.3); transition:transform .15s;
+    .album-art {
+      width: 260px;
+      height: 260px;
+      border-radius: 8px;
+      object-fit: cover;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
     }
-    .play-btn:hover { transform:scale(1.06); } .play-btn:active { transform:scale(0.95); }
+
+    .progress-bar-c {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #1DB954;
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.3s linear;
+    }
+
+    .pbtn {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 20px;
+      cursor: pointer;
+      padding: 8px;
+      transition: color .2s, transform .15s;
+    }
+
+    .pbtn:hover {
+      color: #fff;
+    }
+
+    .pbtn:active {
+      transform: scale(0.9);
+    }
+
+    .play-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      transition: transform .15s;
+    }
+
+    .play-btn:hover {
+      transform: scale(1.06);
+    }
+
+    .play-btn:active {
+      transform: scale(0.95);
+    }
 
     /* ===== GLASS ===== */
-    .glass { background:rgba(255,255,255,0.04); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.06); border-radius:16px; }
+    .glass {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+    }
 
     /* ===== STATS ===== */
-    .stat-num { font-family:'Outfit'; font-size:36px; font-weight:800; line-height:1; background:linear-gradient(135deg,#fff,#e0e0e0); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    .stat-lbl { font-size:11px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:.15em; margin-top:4px; }
+    .stat-num {
+      font-family: 'Outfit';
+      font-size: 36px;
+      font-weight: 800;
+      line-height: 1;
+      background: linear-gradient(135deg, #fff, #e0e0e0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-lbl {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      margin-top: 4px;
+    }
 
     /* ===== MESSAGE CARD ===== */
-    .msg-card { background:linear-gradient(135deg,#e63946,#ff6b6b); border-radius:20px; padding:24px; width:100%; box-shadow:0 8px 32px rgba(230,57,70,0.3); }
+    .msg-card {
+      background: linear-gradient(135deg, #e63946, #ff6b6b);
+      border-radius: 20px;
+      padding: 24px;
+      width: 100%;
+      box-shadow: 0 8px 32px rgba(230, 57, 70, 0.3);
+    }
 
     /* ===== WRAPPED ===== */
-    .wrapped-counter { font-family:'Outfit'; font-size:64px; font-weight:800; line-height:1; background:linear-gradient(135deg,#1DB954,#00d4ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    .wrapped-label { font-size:12px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:.2em; }
+    .wrapped-counter {
+      font-family: 'Outfit';
+      font-size: 64px;
+      font-weight: 800;
+      line-height: 1;
+      background: linear-gradient(135deg, #1DB954, #00d4ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .wrapped-label {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: .2em;
+    }
 
     /* ===== STARS ===== */
-    .star-field { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
-    .star { position:absolute; width:2px; height:2px; background:#fff; border-radius:50%; animation:twinkle 3s ease-in-out infinite; }
-    .constellation-canvas { position:absolute; inset:0; }
+    .star-field {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: #fff;
+      border-radius: 50%;
+      animation: twinkle 3s ease-in-out infinite;
+    }
+
+    .constellation-canvas {
+      position: absolute;
+      inset: 0;
+    }
 
     /* ===== WORDLE ===== */
-    .wordle-row { display:flex; gap:5px; justify-content:center; }
+    .wordle-row {
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+    }
+
     .wordle-cell {
-      width:42px; height:42px; border-radius:8px;
-      display:flex; align-items:center; justify-content:center;
-      font-family:'Outfit'; font-size:18px; font-weight:700;
-      border:2px solid rgba(255,255,255,0.1);
-      background:rgba(255,255,255,0.03);
-      transition:all .3s ease; text-transform:uppercase;
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Outfit';
+      font-size: 18px;
+      font-weight: 700;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      transition: all .3s ease;
+      text-transform: uppercase;
     }
-    .wordle-cell.correct { background:#1DB954; border-color:#1DB954; animation:popIn .4s ease; }
-    .wordle-cell.present { background:#b59f3b; border-color:#b59f3b; animation:popIn .4s ease; }
-    .wordle-cell.absent { background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.08); animation:popIn .4s ease; }
-    .wordle-cell.active { border-color:rgba(255,255,255,0.4); }
-    .wordle-cell.filled { border-color:rgba(255,255,255,0.3); transform:scale(1.05); }
-    .wordle-shake { animation: shake 0.4s ease; }
+
+    .wordle-cell.correct {
+      background: #1DB954;
+      border-color: #1DB954;
+      animation: popIn .4s ease;
+    }
+
+    .wordle-cell.present {
+      background: #b59f3b;
+      border-color: #b59f3b;
+      animation: popIn .4s ease;
+    }
+
+    .wordle-cell.absent {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.08);
+      animation: popIn .4s ease;
+    }
+
+    .wordle-cell.active {
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .wordle-cell.filled {
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .wordle-shake {
+      animation: shake 0.4s ease;
+    }
+
     .kb-key {
-      padding:8px 10px; border-radius:6px; border:none;
-      background:rgba(255,255,255,0.1); color:#fff;
-      font-family:'Outfit'; font-size:13px; font-weight:600;
-      cursor:pointer; transition:all .15s; min-width:26px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-family: 'Outfit';
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+      min-width: 26px;
     }
-    .kb-key:active { transform:scale(0.9); }
-    .kb-key.correct { background:#1DB954; }
-    .kb-key.present { background:#b59f3b; }
-    .kb-key.absent { background:rgba(255,255,255,0.03); color:rgba(255,255,255,0.3); }
+
+    .kb-key:active {
+      transform: scale(0.9);
+    }
+
+    .kb-key.correct {
+      background: #1DB954;
+    }
+
+    .kb-key.present {
+      background: #b59f3b;
+    }
+
+    .kb-key.absent {
+      background: rgba(255, 255, 255, 0.03);
+      color: rgba(255, 255, 255, 0.3);
+    }
 
     /* ===== TIMELINE ===== */
-    .tl-container { position:relative; padding:20px 0; width:100%; }
-    .tl-container::before { content:''; position:absolute; left:20px; top:0; bottom:0; width:2px; background:linear-gradient(to bottom,transparent,rgba(255,255,255,0.1),transparent); }
-    .tl-entry { position:relative; padding-left:48px; margin-bottom:32px; opacity:0; transform:translateY(20px); transition:opacity .6s,transform .6s; }
-    .tl-entry.visible { opacity:1; transform:translateY(0); }
-    .tl-entry::before { content:'💜'; position:absolute; left:10px; top:4px; font-size:14px; z-index:2; }
-    .tl-date { font-family:'Outfit'; font-size:14px; font-weight:700; color:#ff4d8d; margin-bottom:6px; }
-    .tl-text { font-size:13px; color:rgba(255,255,255,0.7); line-height:1.5; margin-bottom:10px; }
-    .polaroid { background:#fff; padding:6px 6px 24px; border-radius:4px; box-shadow:0 4px 16px rgba(0,0,0,0.3); display:inline-block; max-width:220px; }
-    .polaroid img { width:100%; height:160px; object-fit:cover; border-radius:2px; display:block; }
-    .polaroid .hw { font-family:'Caveat'; color:#333; font-size:16px; text-align:center; padding-top:6px; }
-    .p1{transform:rotate(-2deg)}.p2{transform:rotate(1.5deg)}.p3{transform:rotate(-1deg)}.p4{transform:rotate(2deg)}.p5{transform:rotate(-1.5deg)}
+    .tl-container {
+      position: relative;
+      padding: 20px 0;
+      width: 100%;
+    }
+
+    .tl-container::before {
+      content: '';
+      position: absolute;
+      left: 20px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.1), transparent);
+    }
+
+    .tl-entry {
+      position: relative;
+      padding-left: 48px;
+      margin-bottom: 32px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity .6s, transform .6s;
+    }
+
+    .tl-entry.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .tl-entry::before {
+      content: '💜';
+      position: absolute;
+      left: 10px;
+      top: 4px;
+      font-size: 14px;
+      z-index: 2;
+    }
+
+    .tl-date {
+      font-family: 'Outfit';
+      font-size: 14px;
+      font-weight: 700;
+      color: #ff4d8d;
+      margin-bottom: 6px;
+    }
+
+    .tl-text {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .polaroid {
+      background: #fff;
+      padding: 6px 6px 24px;
+      border-radius: 4px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      display: inline-block;
+      max-width: 220px;
+    }
+
+    .polaroid img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 2px;
+      display: block;
+    }
+
+    .polaroid .hw {
+      font-family: 'Caveat';
+      color: #333;
+      font-size: 16px;
+      text-align: center;
+      padding-top: 6px;
+    }
+
+    .p1 {
+      transform: rotate(-2deg)
+    }
+
+    .p2 {
+      transform: rotate(1.5deg)
+    }
+
+    .p3 {
+      transform: rotate(-1deg)
+    }
+
+    .p4 {
+      transform: rotate(2deg)
+    }
+
+    .p5 {
+      transform: rotate(-1.5deg)
+    }
 
     /* ===== MAP ===== */
-    #mapContainer { width:100%; height:250px; border-radius:16px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.06); }
+    #mapContainer {
+      width: 100%;
+      height: 250px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
 
     /* ===== PHOTO STACK ===== */
-    .photo-stack { position:relative; width:260px; height:340px; perspective:600px; }
-    .stack-card {
-      position:absolute; inset:0; border-radius:16px; overflow:hidden;
-      box-shadow:0 8px 32px rgba(0,0,0,0.4);
-      transition:transform .5s cubic-bezier(0.34,1.56,0.64,1), opacity .4s; cursor:pointer;
+    .photo-stack {
+      position: relative;
+      width: 260px;
+      height: 340px;
+      perspective: 600px;
     }
-    .stack-card img { width:100%; height:100%; object-fit:cover; }
+
+    .stack-card {
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      transition: transform .5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity .4s;
+      cursor: grab;
+      touch-action: none;
+    }
+    .stack-card:active {
+      cursor: grabbing;
+    }
+
+    .stack-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
     .stack-card .card-caption {
-      position:absolute; bottom:0; left:0; right:0;
-      padding:16px; background:linear-gradient(transparent,rgba(0,0,0,0.8));
-      font-family:'Caveat'; font-size:20px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+      font-family: 'Caveat';
+      font-size: 20px;
     }
 
     /* ===== GALLERY ===== */
-    .gal-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; }
-    .gal-item { border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.3); aspect-ratio:3/4; }
-    .gal-item img { width:100%; height:100%; object-fit:cover; transition:transform .4s; }
-    .gal-item:hover img { transform:scale(1.05); }
-    .gal-item.tall { grid-row:span 2; }
+    .gal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .gal-item {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      aspect-ratio: 3/4;
+    }
+
+    .gal-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .4s;
+    }
+
+    .gal-item:hover img {
+      transform: scale(1.05);
+    }
+
+    .gal-item.tall {
+      grid-row: span 2;
+    }
 
     /* ===== WHEEL ===== */
-    .wheel-wrap { position:relative; width:260px; height:260px; }
-    .wheel-canvas { width:100%; height:100%; border-radius:50%; box-shadow:0 0 30px rgba(29,185,84,0.2); }
-    .wheel-ptr { position:absolute; top:-12px; left:50%; transform:translateX(-50%); font-size:28px; z-index:5; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
-    .wheel-result { display:none; text-align:center; animation:fadeUp .6s ease forwards; }
-    .wheel-result.show { display:block; }
+    .wheel-wrap {
+      position: relative;
+      width: 260px;
+      height: 260px;
+    }
+
+    .wheel-canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      box-shadow: 0 0 30px rgba(29, 185, 84, 0.2);
+    }
+
+    .wheel-ptr {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 28px;
+      z-index: 5;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    }
+
+    .wheel-result {
+      display: none;
+      text-align: center;
+      animation: fadeUp .6s ease forwards;
+    }
+
+    .wheel-result.show {
+      display: block;
+    }
 
     /* ===== CONQUISTA ===== */
-    .holo-card-container { perspective:800px; width:280px; height:380px; cursor:pointer; }
-    .holo-card { position:relative; width:100%; height:100%; transition:transform .8s cubic-bezier(0.4,0,0.2,1); transform-style:preserve-3d; }
-    .holo-card.flipped { transform:rotateY(180deg); }
-    .holo-face {
-      position:absolute; inset:0; border-radius:20px; backface-visibility:hidden; overflow:hidden;
-      display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px;
+    .holo-card-container {
+      perspective: 800px;
+      width: 280px;
+      height: 380px;
+      cursor: pointer;
     }
-    .holo-front { background:linear-gradient(135deg,#0f0f2e,#1a0a3e,#0d1f3d); border:2px solid rgba(255,255,255,0.1); box-shadow:0 8px 40px rgba(124,58,237,0.2); }
-    .holo-back { transform:rotateY(180deg); background:linear-gradient(135deg,#1a0a2e,#2d1b69,#0d1f3d); border:2px solid rgba(124,58,237,0.3); }
-    .holo-shimmer { position:absolute; inset:0; border-radius:20px; background:linear-gradient(45deg,transparent 30%,rgba(255,255,255,0.05) 50%,transparent 70%); background-size:200% 200%; animation:holographic 3s ease infinite; pointer-events:none; }
-    .holo-badge { width:100px; height:100px; border-radius:50%; background:linear-gradient(135deg,#1DB954,#00d4ff); display:flex; align-items:center; justify-content:center; font-size:48px; box-shadow:0 0 30px rgba(29,185,84,0.3); animation:glow 2s ease infinite; }
+
+    .holo-card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform .8s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+
+    .holo-card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .holo-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      backface-visibility: hidden;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .holo-front {
+      background: linear-gradient(135deg, #0f0f2e, #1a0a3e, #0d1f3d);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 40px rgba(124, 58, 237, 0.2);
+    }
+
+    .holo-back {
+      transform: rotateY(180deg);
+      background: linear-gradient(135deg, #1a0a2e, #2d1b69, #0d1f3d);
+      border: 2px solid rgba(124, 58, 237, 0.3);
+    }
+
+    .holo-shimmer {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.05) 50%, transparent 70%);
+      background-size: 200% 200%;
+      animation: holographic 3s ease infinite;
+      pointer-events: none;
+    }
+
+    .holo-badge {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1DB954, #00d4ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      box-shadow: 0 0 30px rgba(29, 185, 84, 0.3);
+      animation: glow 2s ease infinite;
+    }
 
     /* ===== FINAL ===== */
-    .final-bg { position:absolute; inset:0; background-size:cover; background-position:center; filter:brightness(0.35) blur(2px); }
+    .final-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.35) blur(2px);
+    }
 
     /* ===== BUTTONS ===== */
-    .btn { display:inline-flex; align-items:center; gap:6px; padding:12px 28px; border-radius:30px; border:none; font-family:'Outfit'; font-weight:600; font-size:14px; cursor:pointer; transition:transform .2s,box-shadow .2s,opacity .3s; }
-    .btn:hover { transform:scale(1.04); } .btn:active { transform:scale(0.96); }
-    .btn-g { background:#1DB954; color:#fff; box-shadow:0 4px 16px rgba(29,185,84,0.3); }
-    .btn-o { background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.1); }
-    .btn-r { background:linear-gradient(135deg,#e63946,#ff6b6b); color:#fff; box-shadow:0 4px 16px rgba(230,57,70,0.3); }
-    .btn-p { background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; box-shadow:0 4px 16px rgba(124,58,237,0.3); }
-    .btn:disabled { opacity:0.3; cursor:not-allowed; transform:none !important; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 28px;
+      border-radius: 30px;
+      border: none;
+      font-family: 'Outfit';
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s, opacity .3s;
+    }
+
+    .btn:hover {
+      transform: scale(1.04);
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-g {
+      background: #1DB954;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(29, 185, 84, 0.3);
+    }
+
+    .btn-o {
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-r {
+      background: linear-gradient(135deg, #e63946, #ff6b6b);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(230, 57, 70, 0.3);
+    }
+
+    .btn-p {
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3);
+    }
+
+    .btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      transform: none !important;
+    }
 
     /* ===== SECTION IMG ===== */
-    .sec-img { width:100%; border-radius:16px; object-fit:cover; box-shadow:0 8px 32px rgba(0,0,0,0.4); }
+    .sec-img {
+      width: 100%;
+      border-radius: 16px;
+      object-fit: cover;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
 
     /* ===== FLOATING AUDIO ===== */
     .float-audio {
-      position:fixed; bottom:16px; right:16px; z-index:200;
-      width:46px; height:46px; border-radius:50%;
-      background:rgba(29,185,84,0.9); backdrop-filter:blur(10px);
-      display:flex; align-items:center; justify-content:center;
-      cursor:pointer; box-shadow:0 4px 20px rgba(29,185,84,0.4);
-      transition:transform .2s; border:none; color:#fff; font-size:18px;
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      z-index: 200;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: rgba(29, 185, 84, 0.9);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(29, 185, 84, 0.4);
+      transition: transform .2s;
+      border: none;
+      color: #fff;
+      font-size: 18px;
     }
-    .float-audio:hover { transform:scale(1.1); }
-    .float-audio.playing { animation:pulse 2s ease infinite; }
 
-    .confetti-piece { position:fixed; z-index:300; pointer-events:none; animation:confettiFall 3s linear forwards; }
+    .float-audio:hover {
+      transform: scale(1.1);
+    }
+
+    .float-audio.playing {
+      animation: pulse 2s ease infinite;
+    }
+
+    .confetti-piece {
+      position: fixed;
+      z-index: 300;
+      pointer-events: none;
+      animation: confettiFall 3s linear forwards;
+    }
   </style>
 </head>
+
 <body>
   <audio id="audioPlayer" src="mirrors.mp3" preload="auto"></audio>
   <div class="dots-container" id="dotsC"></div>
@@ -226,51 +915,83 @@
       <img src="foto1.jpg" alt="Nós" class="album-art anim-fadeUp s1">
       <div class="w-full anim-fadeUp s2">
         <div class="flex items-center justify-between">
-          <div><h2 class="font-outfit font-bold text-lg">Mirrors</h2><p class="text-sm" style="color:rgba(255,255,255,0.5)">Justin Timberlake</p></div>
+          <div>
+            <h2 class="font-outfit font-bold text-lg">Mirrors</h2>
+            <p class="text-sm" style="color:rgba(255,255,255,0.5)">Justin Timberlake</p>
+          </div>
           <div style="color:#1DB954;font-size:20px;">✓</div>
         </div>
       </div>
       <div class="w-full anim-fadeUp s3">
-        <div class="progress-bar-c" id="progBar"><div class="progress-fill" id="progFill"></div></div>
-        <div class="flex justify-between mt-1"><span class="text-[10px]" style="color:rgba(255,255,255,0.4)" id="curTime">0:00</span><span class="text-[10px]" style="color:rgba(255,255,255,0.4)">-8:31</span></div>
+        <div class="progress-bar-c" id="progBar">
+          <div class="progress-fill" id="progFill"></div>
+        </div>
+        <div class="flex justify-between mt-1"><span class="text-[10px]" style="color:rgba(255,255,255,0.4)"
+            id="curTime">0:00</span><span class="text-[10px]" style="color:rgba(255,255,255,0.4)">-8:31</span></div>
       </div>
       <div class="flex items-center justify-center gap-6 w-full anim-fadeUp s4">
         <button class="pbtn">🔀</button><button class="pbtn" style="font-size:24px;">⏮</button>
-        <button class="play-btn" onclick="toggleAudio()"><span style="color:#000;font-size:24px;margin-left:2px;" id="playIcon">▶</span></button>
+        <button class="play-btn" onclick="toggleAudio()"><span style="color:#000;font-size:24px;margin-left:2px;"
+            id="playIcon">▶</span></button>
         <button class="pbtn" style="font-size:24px;">⏭</button><button class="pbtn">🔁</button>
       </div>
-      <button class="btn btn-g anim-fadeUp s5" onclick="goTo(1)" style="padding:10px 24px;border-radius:24px;">Sobre o casal →</button>
+      <button class="btn btn-g anim-fadeUp s5" onclick="goTo(1)" style="padding:10px 24px;border-radius:24px;">Sobre o
+        casal →</button>
     </div>
   </section>
 
   <!-- ===== 1 — STATS ===== -->
   <section class="screen" id="s-1" style="background:linear-gradient(180deg,#0d1f0d,#0a0a0a 60%);">
     <div class="flex flex-col items-center min-h-screen px-6 py-16 gap-5 w-full max-w-sm">
-      <div class="anim-fadeUp s1" style="width:80px;height:80px;border-radius:50%;overflow:hidden;border:3px solid rgba(29,185,84,0.4);">
+      <div class="anim-fadeUp s1"
+        style="width:80px;height:80px;border-radius:50%;overflow:hidden;border:3px solid rgba(29,185,84,0.4);">
         <img src="foto1.jpg" alt="Nós" style="width:100%;height:100%;object-fit:cover;">
       </div>
-      <div class="text-center anim-fadeUp s2"><h1 class="font-outfit font-bold text-2xl" id="names">Gabriel e Ester</h1><p class="text-sm mt-1" style="color:#1DB954;">Juntos desde 2024</p></div>
+      <div class="text-center anim-fadeUp s2">
+        <h1 class="font-outfit font-bold text-2xl" id="names">Gabriel e Ester</h1>
+        <p class="text-sm mt-1" style="color:#1DB954;">Juntos desde 2024</p>
+      </div>
       <div class="glass p-4 w-full anim-fadeUp s3">
         <div class="flex items-center justify-around">
-          <div class="text-center flex-1"><div class="stat-num" id="sA">0</div><div class="stat-lbl">Anos</div></div>
+          <div class="text-center flex-1">
+            <div class="stat-num" id="sA">0</div>
+            <div class="stat-lbl">Anos</div>
+          </div>
           <div style="width:1px;height:40px;background:rgba(255,255,255,0.08);"></div>
-          <div class="text-center flex-1"><div class="stat-num" id="sM">0</div><div class="stat-lbl">Meses</div></div>
+          <div class="text-center flex-1">
+            <div class="stat-num" id="sM">0</div>
+            <div class="stat-lbl">Meses</div>
+          </div>
           <div style="width:1px;height:40px;background:rgba(255,255,255,0.08);"></div>
-          <div class="text-center flex-1"><div class="stat-num" id="sD">0</div><div class="stat-lbl">Dias</div></div>
+          <div class="text-center flex-1">
+            <div class="stat-num" id="sD">0</div>
+            <div class="stat-lbl">Dias</div>
+          </div>
         </div>
       </div>
       <div class="glass p-4 w-full anim-fadeUp s4">
         <div class="flex items-center justify-around">
-          <div class="text-center flex-1"><div class="stat-num" id="sH">0</div><div class="stat-lbl">Horas</div></div>
+          <div class="text-center flex-1">
+            <div class="stat-num" id="sH">0</div>
+            <div class="stat-lbl">Horas</div>
+          </div>
           <div style="width:1px;height:40px;background:rgba(255,255,255,0.08);"></div>
-          <div class="text-center flex-1"><div class="stat-num" id="sMi">0</div><div class="stat-lbl">Minutos</div></div>
+          <div class="text-center flex-1">
+            <div class="stat-num" id="sMi">0</div>
+            <div class="stat-lbl">Minutos</div>
+          </div>
           <div style="width:1px;height:40px;background:rgba(255,255,255,0.08);"></div>
-          <div class="text-center flex-1"><div class="stat-num" id="sS">0</div><div class="stat-lbl">Seg</div></div>
+          <div class="text-center flex-1">
+            <div class="stat-num" id="sS">0</div>
+            <div class="stat-lbl">Seg</div>
+          </div>
         </div>
       </div>
       <div class="msg-card anim-fadeUp s5">
         <p class="font-outfit font-bold text-sm mb-2" style="opacity:0.9;">Mensagem especial ❤️</p>
-        <p class="text-sm leading-relaxed" style="opacity:0.95;">Você é o amor da minha vida e a pessoa que me faz querer ser melhor a cada novo dia. Cada momento ao seu lado é único e especial. Eu te amo mais do que palavras podem expressar. 💜</p>
+        <p class="text-sm leading-relaxed" style="opacity:0.95;">Você é o amor da minha vida e a pessoa que me faz
+          querer ser melhor a cada novo dia. Cada momento ao seu lado é único e especial. Eu te amo mais do que palavras
+          podem expressar. 💜</p>
       </div>
       <button class="btn btn-g anim-fadeUp s6" onclick="goTo(2)">Continuar →</button>
     </div>
@@ -288,12 +1009,22 @@
           <div class="wrapped-label">dias juntos</div>
         </div>
         <div class="flex justify-around">
-          <div class="text-center"><div class="font-outfit font-bold text-xl" style="color:#1DB954;" id="wrHours">0</div><div class="wrapped-label">horas</div></div>
-          <div class="text-center"><div class="font-outfit font-bold text-xl" style="color:#ff4d8d;" id="wrKisses">∞</div><div class="wrapped-label">beijos</div></div>
-          <div class="text-center"><div class="font-outfit font-bold text-xl" style="color:#a855f7;" id="wrSmiles">∞</div><div class="wrapped-label">sorrisos</div></div>
+          <div class="text-center">
+            <div class="font-outfit font-bold text-xl" style="color:#1DB954;" id="wrHours">0</div>
+            <div class="wrapped-label">horas</div>
+          </div>
+          <div class="text-center">
+            <div class="font-outfit font-bold text-xl" style="color:#ff4d8d;" id="wrKisses">∞</div>
+            <div class="wrapped-label">beijos</div>
+          </div>
+          <div class="text-center">
+            <div class="font-outfit font-bold text-xl" style="color:#a855f7;" id="wrSmiles">∞</div>
+            <div class="wrapped-label">sorrisos</div>
+          </div>
         </div>
       </div>
-      <p class="font-caveat text-center anim-fadeUp s4" style="font-size:22px;color:rgba(255,255,255,0.5);">"Cada segundo com você vale a eternidade" ✨</p>
+      <p class="font-caveat text-center anim-fadeUp s4" style="font-size:22px;color:rgba(255,255,255,0.5);">"Cada
+        segundo com você vale a eternidade" ✨</p>
       <button class="btn btn-p anim-fadeUp s5" onclick="goTo(3)">Continuar →</button>
     </div>
   </section>
@@ -302,21 +1033,30 @@
   <section class="screen" id="s-3" style="background:linear-gradient(180deg,#050520,#0a0a1a);">
     <div class="star-field" id="uniStars"></div>
     <svg class="constellation-canvas" id="constSvg" style="z-index:1;"></svg>
-    <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-6 w-full max-w-sm" style="position:relative;z-index:2;">
+    <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-6 w-full max-w-sm"
+      style="position:relative;z-index:2;">
       <div class="text-5xl anim-fadeUp s1" style="animation:float 3s ease-in-out infinite;">🌌</div>
       <h2 class="font-outfit font-bold text-2xl text-center anim-fadeUp s2">O Universo Estava<br>Alinhado</h2>
-      <p class="text-center text-sm anim-fadeUp s3" style="color:rgba(255,255,255,0.5);">23 de Dezembro de 2023, Lagoa Santa. As estrelas conspiraram para que nos encontrássemos.</p>
+      <p class="text-center text-sm anim-fadeUp s3" style="color:rgba(255,255,255,0.5);">23 de Dezembro de 2023, Lagoa
+        Santa. As estrelas conspiraram para que nos encontrássemos.</p>
       <div class="glass p-5 w-full anim-fadeUp s4">
         <div class="flex items-center gap-3 mb-3">
           <span style="font-size:28px;">🌙</span>
-          <div><p class="font-outfit font-semibold text-sm">Fase da Lua</p><p class="text-xs" style="color:rgba(255,255,255,0.5);">Gibosa Crescente — 23/12/2023</p></div>
+          <div>
+            <p class="font-outfit font-semibold text-sm">Fase da Lua</p>
+            <p class="text-xs" style="color:rgba(255,255,255,0.5);">Gibosa Crescente — 23/12/2023</p>
+          </div>
         </div>
         <div class="flex items-center gap-3">
           <span style="font-size:28px;">♑</span>
-          <div><p class="font-outfit font-semibold text-sm">Signo do Dia</p><p class="text-xs" style="color:rgba(255,255,255,0.5);">Capricórnio ☀️ — início de uma nova era</p></div>
+          <div>
+            <p class="font-outfit font-semibold text-sm">Signo do Dia</p>
+            <p class="text-xs" style="color:rgba(255,255,255,0.5);">Capricórnio ☀️ — início de uma nova era</p>
+          </div>
         </div>
       </div>
-      <p class="font-caveat text-center anim-fadeUp s5" style="font-size:20px;color:rgba(255,255,255,0.4);">As constelações desenharam nosso destino ✨</p>
+      <p class="font-caveat text-center anim-fadeUp s5" style="font-size:20px;color:rgba(255,255,255,0.4);">As
+        constelações desenharam nosso destino ✨</p>
       <button class="btn btn-p anim-fadeUp s6" onclick="goTo(4)">Continuar →</button>
     </div>
   </section>
@@ -326,11 +1066,14 @@
     <div class="flex flex-col items-center justify-center min-h-screen px-5 py-14 gap-3 w-full max-w-sm">
       <div class="text-3xl anim-fadeUp s1">💝</div>
       <h2 class="font-outfit font-bold text-xl text-center anim-fadeUp s2">Algo que amo em você</h2>
-      <p class="text-center text-xs anim-fadeUp s3" style="color:rgba(255,255,255,0.4);">Descubra a palavra de 7 letras para continuar</p>
+      <p class="text-center text-xs anim-fadeUp s3" style="color:rgba(255,255,255,0.4);">Descubra a palavra de 7 letras
+        para continuar</p>
       <div class="flex flex-col gap-2 anim-fadeUp s4" id="wordleGrid"></div>
-      <div id="wordleMsg" class="text-center font-outfit font-bold text-sm" style="min-height:24px;color:#1DB954;"></div>
+      <div id="wordleMsg" class="text-center font-outfit font-bold text-sm" style="min-height:24px;color:#1DB954;">
+      </div>
       <div class="flex flex-col gap-1 w-full anim-fadeUp s5" id="keyboard"></div>
-      <button class="btn btn-g anim-fadeUp s6" id="wordleNext" onclick="goTo(5)" disabled>🔒 Acerte para continuar</button>
+      <button class="btn btn-g anim-fadeUp s6" id="wordleNext" onclick="goTo(5)" disabled>🔒 Acerte para
+        continuar</button>
     </div>
   </section>
 
@@ -338,13 +1081,45 @@
   <section class="screen" id="s-5" style="background:linear-gradient(180deg,#0f0f1a,#0a0a0a 50%);">
     <div class="flex flex-col items-center px-5 py-16 gap-4 w-full max-w-sm" style="min-height:100vh;">
       <h2 class="font-outfit font-bold text-2xl text-center anim-fadeUp s1">Nossa Jornada</h2>
-      <p class="text-center anim-fadeUp s2" style="color:rgba(255,255,255,0.4);font-size:13px;">Cada momento que nos trouxe até aqui.</p>
+      <p class="text-center anim-fadeUp s2" style="color:rgba(255,255,255,0.4);font-size:13px;">Cada momento que nos
+        trouxe até aqui.</p>
       <div class="tl-container anim-fadeUp s3">
-        <div class="tl-entry" data-r><div class="tl-date">Dezembro 2023</div><div class="tl-text">Nos conhecemos em Lagoa Santa ✨ O destino nos colocou no mesmo caminho.</div><div class="polaroid p1"><img src="foto2.jpg" alt=""><div class="hw">O início de tudo 💫</div></div></div>
-        <div class="tl-entry" data-r><div class="tl-date">Janeiro 2024</div><div class="tl-text">Oficialmente juntos! 💜 O melhor "sim" que já existiu.</div><div class="polaroid p2"><img src="foto1.jpg" alt=""><div class="hw">Eu te amo! ❤️</div></div></div>
-        <div class="tl-entry" data-r><div class="tl-date">2024</div><div class="tl-text">Passeios, aventuras e muitas risadas juntos. 💛💚</div><div class="polaroid p3"><img src="foto4.png" alt=""><div class="hw">Amo estar ao seu lado ✨</div></div></div>
-        <div class="tl-entry" data-r><div class="tl-date">Viagem à praia</div><div class="tl-text">O pôr do sol mais lindo ao lado da pessoa mais linda. 🌅</div><div class="polaroid p4"><img src="foto3.jpg" alt=""><div class="hw">Pôr do sol perfeito 🌅</div></div></div>
-        <div class="tl-entry" data-r><div class="tl-date">Réveillon</div><div class="tl-text">Virada do ano juntos, fogos e um beijo que vale por mil. 🎆💜</div><div class="polaroid p5"><img src="foto5.png" alt=""><div class="hw">Pra sempre nós dois 💜</div></div></div>
+        <div class="tl-entry" data-r>
+          <div class="tl-date">Dezembro 2023</div>
+          <div class="tl-text">Nos conhecemos em Lagoa Santa ✨ O destino nos colocou no mesmo caminho.</div>
+          <div class="polaroid p1"><img src="foto2.jpg" alt="">
+            <div class="hw">O início de tudo 💫</div>
+          </div>
+        </div>
+        <div class="tl-entry" data-r>
+          <div class="tl-date">Janeiro 2024</div>
+          <div class="tl-text">Oficialmente juntos! 💜 O melhor "sim" que já existiu.</div>
+          <div class="polaroid p2"><img src="foto7.jpg" alt="">
+            <div class="hw">Eu te amo! ❤️</div>
+          </div>
+        </div>
+        <div class="tl-entry" data-r>
+          <div class="tl-date">2024</div>
+          <div class="tl-text">Passeios, aventuras e muitas risadas juntos. 💛💚</div>
+          <div class="polaroid p3"><img src="foto4.png" alt=""
+              onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#a855f7,#ff4d8d)';this.parentElement.style.minHeight='160px';">
+            <div class="hw">Amo estar ao seu lado ✨</div>
+          </div>
+        </div>
+        <div class="tl-entry" data-r>
+          <div class="tl-date">Viagem à praia</div>
+          <div class="tl-text">O pôr do sol mais lindo ao lado da pessoa mais linda. 🌅</div>
+          <div class="polaroid p4"><img src="foto3.jpg" alt="">
+            <div class="hw">Pôr do sol perfeito 🌅</div>
+          </div>
+        </div>
+        <div class="tl-entry" data-r>
+          <div class="tl-date">Réveillon</div>
+          <div class="tl-text">Virada do ano juntos, fogos e um beijo que vale por mil. 🎆💜</div>
+          <div class="polaroid p5"><img src="foto5.png" alt="">
+            <div class="hw">Pra sempre nós dois 💜</div>
+          </div>
+        </div>
       </div>
       <div class="flex gap-3 mt-4 pb-8">
         <button class="btn btn-o" onclick="goTo(4)">← Voltar</button>
@@ -358,12 +1133,30 @@
     <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-5 w-full max-w-sm">
       <div class="text-4xl anim-fadeUp s1">📍</div>
       <h2 class="font-outfit font-bold text-2xl text-center anim-fadeUp s2">Nossos Lugares</h2>
-      <p class="text-center text-sm anim-fadeUp s3" style="color:rgba(255,255,255,0.5);">Todos os lugares que marcaram nossa história</p>
-      <div class="anim-fadeUp s4 w-full"><div id="mapContainer"></div></div>
+      <p class="text-center text-sm anim-fadeUp s3" style="color:rgba(255,255,255,0.5);">Todos os lugares que marcaram
+        nossa história</p>
+      <div class="anim-fadeUp s4 w-full">
+        <div id="mapContainer"></div>
+      </div>
       <div class="glass p-4 w-full anim-fadeUp s5">
-        <div class="flex items-center gap-3 mb-3"><span style="font-size:20px;">💜</span><div><p class="font-outfit font-semibold text-sm">Lagoa Santa, MG</p><p class="text-xs" style="color:rgba(255,255,255,0.5);">Onde tudo começou — 23/12/2023</p></div></div>
-        <div class="flex items-center gap-3 mb-3"><span style="font-size:20px;">🏖️</span><div><p class="font-outfit font-semibold text-sm">Guarapari, ES</p><p class="text-xs" style="color:rgba(255,255,255,0.5);">Praia e pôr do sol juntos</p></div></div>
-        <div class="flex items-center gap-3"><span style="font-size:20px;">🌴</span><div><p class="font-outfit font-semibold text-sm">Porto Seguro, BA</p><p class="text-xs" style="color:rgba(255,255,255,0.5);">Paraíso a dois</p></div></div>
+        <div class="flex items-center gap-3 mb-3"><span style="font-size:20px;">💜</span>
+          <div>
+            <p class="font-outfit font-semibold text-sm">Lagoa Santa, MG</p>
+            <p class="text-xs" style="color:rgba(255,255,255,0.5);">Onde tudo começou — 23/12/2023</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 mb-3"><span style="font-size:20px;">🏖️</span>
+          <div>
+            <p class="font-outfit font-semibold text-sm">Guarapari, ES</p>
+            <p class="text-xs" style="color:rgba(255,255,255,0.5);">Praia e pôr do sol juntos</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3"><span style="font-size:20px;">🌴</span>
+          <div>
+            <p class="font-outfit font-semibold text-sm">Porto Seguro, BA</p>
+            <p class="text-xs" style="color:rgba(255,255,255,0.5);">Paraíso a dois</p>
+          </div>
+        </div>
       </div>
       <button class="btn btn-g anim-fadeUp s6" onclick="goTo(7)">Continuar →</button>
     </div>
@@ -373,9 +1166,11 @@
   <section class="screen" id="s-7" style="background:linear-gradient(180deg,#1a0a1a,#0a0a0a 60%);">
     <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-5 w-full max-w-sm">
       <h2 class="font-outfit font-bold text-2xl text-center anim-fadeUp s1">Nossos Momentos 📸</h2>
-      <p class="text-center text-sm anim-fadeUp s2" style="color:rgba(255,255,255,0.5);">Toque para ver a próxima foto</p>
+      <p class="text-center text-sm anim-fadeUp s2" style="color:rgba(255,255,255,0.5);">Toque para ver a próxima foto
+      </p>
       <div class="photo-stack anim-fadeUp s3" id="photoStack"></div>
-      <p class="font-caveat text-center anim-fadeUp s4" style="font-size:18px;color:rgba(255,255,255,0.4);" id="stackCounter">1 / 6</p>
+      <p class="font-caveat text-center anim-fadeUp s4" style="font-size:18px;color:rgba(255,255,255,0.4);"
+        id="stackCounter">1 / 6</p>
       <button class="btn btn-r anim-fadeUp s5" onclick="goTo(8)">Continuar →</button>
     </div>
   </section>
@@ -384,9 +1179,12 @@
   <section class="screen" id="s-8" style="background:linear-gradient(180deg,#1a0a2e,#0a0a0a 60%);">
     <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-6 w-full max-w-sm">
       <h2 class="font-outfit font-bold text-xl text-center anim-fadeUp s1">Saudades de momentos 😊</h2>
-      <p class="text-center text-sm anim-fadeUp s2" style="color:rgba(255,255,255,0.6);line-height:1.7;">Muitos momentos bons e eu queria que fossem eternos. Cada lembrança com você é um tesouro. 💚</p>
-      <div class="anim-fadeUp s3" style="width:100%;"><img src="foto3.jpg" alt="" class="sec-img" style="max-height:380px;"></div>
-      <p class="font-caveat text-center anim-fadeUp s4" style="font-size:22px;color:rgba(255,255,255,0.5);">"Que saudade de viver tudo de novo..." 💜</p>
+      <p class="text-center text-sm anim-fadeUp s2" style="color:rgba(255,255,255,0.6);line-height:1.7;">Muitos momentos
+        bons e eu queria que fossem eternos. Cada lembrança com você é um tesouro. 💚</p>
+      <div class="anim-fadeUp s3" style="width:100%;"><img src="foto3.jpg" alt="" class="sec-img"
+          style="max-height:380px;"></div>
+      <p class="font-caveat text-center anim-fadeUp s4" style="font-size:22px;color:rgba(255,255,255,0.5);">"Que saudade
+        de viver tudo de novo..." 💜</p>
       <button class="btn btn-r anim-fadeUp s5" onclick="goTo(9)">Ver mais →</button>
     </div>
   </section>
@@ -396,17 +1194,29 @@
     <div class="flex flex-col items-center min-h-screen px-6 py-16 gap-4 w-full max-w-sm">
       <h2 class="font-outfit font-bold text-xl text-center anim-fadeUp s1">Que casal lindo! 😍</h2>
       <p class="anim-fadeUp s2" style="color:rgba(255,255,255,0.4);font-size:13px;">(só isso mesmo)</p>
-      <div class="gal-grid anim-fadeUp s3">
-        <div class="gal-item tall"><img src="foto1.jpg" alt=""></div>
-        <div class="gal-item"><img src="foto2.jpg" alt=""></div>
-        <div class="gal-item"><img src="foto6.jpg" alt=""></div>
+      <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:10px;width:100%;" class="anim-fadeUp s3">
+        <div class="gal-item"><img src="foto1.jpg" alt=""
+            onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#7c3aed,#e63946)'">
+        </div>
+        <div class="gal-item"><img src="foto2.jpg" alt=""
+            onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#1DB954,#00d4ff)'">
+        </div>
+        <div class="gal-item"><img src="foto6.jpg" alt=""
+            onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#e63946,#ff6b6b)'">
+        </div>
+        <div class="gal-item"><img src="foto3.jpg" alt=""
+            onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#ff6b6b,#7c3aed)'">
+        </div>
+        <div class="gal-item"><img src="foto4.png" alt=""
+            onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#a855f7,#ff4d8d)'">
+        </div>
+        <div class="gal-item"><img src="foto5.png" alt=""
+            onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#0d9e3f,#00d4ff)'">
+        </div>
       </div>
-      <div class="gal-grid anim-fadeUp s4" style="margin-top:-2px;">
-        <div class="gal-item"><img src="foto4.png" alt=""></div>
-        <div class="gal-item"><img src="foto5.png" alt=""></div>
-      </div>
-      <p class="font-caveat text-center anim-fadeUp s5" style="font-size:20px;color:rgba(255,255,255,0.5);">Cada foto conta uma parte da nossa história ✨</p>
-      <button class="btn btn-g anim-fadeUp s6" onclick="goTo(10)">Próximo →</button>
+      <p class="font-caveat text-center anim-fadeUp s6" style="font-size:20px;color:rgba(255,255,255,0.5);">Cada foto
+        conta uma parte da nossa história ✨</p>
+      <button class="btn btn-g anim-fadeUp s7" onclick="goTo(10)">Próximo →</button>
     </div>
   </section>
 
@@ -415,10 +1225,16 @@
     <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-5 w-full max-w-sm">
       <div class="text-4xl anim-fadeUp s1">🎰</div>
       <h2 class="font-outfit font-bold text-xl text-center anim-fadeUp s2">Roleta de Encontros</h2>
-      <p class="text-center text-sm anim-fadeUp s3" style="color:rgba(255,255,255,0.5);">Gire a roleta e descubra nosso próximo programa!</p>
-      <div class="wheel-wrap anim-fadeUp s4"><div class="wheel-ptr">▼</div><canvas id="wheelCanvas" class="wheel-canvas" width="260" height="260"></canvas></div>
+      <p class="text-center text-sm anim-fadeUp s3" style="color:rgba(255,255,255,0.5);">Gire a roleta e descubra nosso
+        próximo programa!</p>
+      <div class="wheel-wrap anim-fadeUp s4">
+        <div class="wheel-ptr">▼</div><canvas id="wheelCanvas" class="wheel-canvas" width="260" height="260"></canvas>
+      </div>
       <button class="btn btn-r anim-fadeUp s5" id="spinBtn" onclick="spinWheel()">🎲 Girar!</button>
-      <div class="wheel-result glass p-5 w-full" id="wheelRes"><p class="font-outfit font-bold text-lg text-center" id="wheelResTxt"></p><p class="font-caveat text-center mt-2" style="font-size:18px;color:rgba(255,255,255,0.5);">Bora marcar? 💜</p></div>
+      <div class="wheel-result glass p-5 w-full" id="wheelRes">
+        <p class="font-outfit font-bold text-lg text-center" id="wheelResTxt"></p>
+        <p class="font-caveat text-center mt-2" style="font-size:18px;color:rgba(255,255,255,0.5);">Bora marcar? 💜</p>
+      </div>
       <button class="btn btn-g anim-fadeUp s6" onclick="goTo(11)">Próximo →</button>
     </div>
   </section>
@@ -431,8 +1247,21 @@
       <p class="text-center text-sm anim-fadeUp s3" style="color:rgba(255,255,255,0.5);">Toque no card para virar</p>
       <div class="holo-card-container anim-fadeUp s4" onclick="flipCard()">
         <div class="holo-card" id="holoCard">
-          <div class="holo-face holo-front"><div class="holo-shimmer"></div><div class="holo-badge">🏆</div><p class="font-outfit font-bold text-lg mt-4">Conquista Rara</p><p class="text-sm mt-1" style="color:rgba(255,255,255,0.5);">Toque para revelar</p></div>
-          <div class="holo-face holo-back"><div class="holo-shimmer"></div><p style="font-size:48px;margin-bottom:12px;">💜</p><p class="font-outfit font-bold text-lg text-center">Melhor Casal<br>do Universo</p><p class="font-caveat text-center mt-3" style="font-size:20px;color:rgba(255,255,255,0.6);">Gabriel & Ester</p><p class="text-xs mt-3" style="color:rgba(255,255,255,0.3);">Desde 14/01/2024 • Nível Máximo</p><div class="flex gap-1 mt-3"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div></div>
+          <div class="holo-face holo-front">
+            <div class="holo-shimmer"></div>
+            <div class="holo-badge">🏆</div>
+            <p class="font-outfit font-bold text-lg mt-4">Conquista Rara</p>
+            <p class="text-sm mt-1" style="color:rgba(255,255,255,0.5);">Toque para revelar</p>
+          </div>
+          <div class="holo-face holo-back">
+            <div class="holo-shimmer"></div>
+            <p style="font-size:48px;margin-bottom:12px;">💜</p>
+            <p class="font-outfit font-bold text-lg text-center">Melhor Casal<br>do Universo</p>
+            <p class="font-caveat text-center mt-3" style="font-size:20px;color:rgba(255,255,255,0.6);">Gabriel & Ester
+            </p>
+            <p class="text-xs mt-3" style="color:rgba(255,255,255,0.3);">Desde 14/01/2024 • Nível Máximo</p>
+            <div class="flex gap-1 mt-3"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div>
+          </div>
         </div>
       </div>
       <button class="btn btn-g anim-fadeUp s5" onclick="goTo(12)">Ver final →</button>
@@ -442,11 +1271,17 @@
   <!-- ===== 12 — FINAL ===== -->
   <section class="screen" id="s-12" style="background:#000;">
     <div class="final-bg" style="background-image:url('foto5.png');" id="finalBg"></div>
-    <div class="final-content flex flex-col items-center justify-center min-h-screen px-8 gap-6" style="position:relative;z-index:10;">
+    <div class="final-content flex flex-col items-center justify-center min-h-screen px-8 gap-6"
+      style="position:relative;z-index:10;">
       <div class="anim-fadeUp s1" style="font-size:48px;">💜</div>
-      <h2 class="font-outfit font-bold text-3xl text-center anim-fadeUp s2" style="text-shadow:0 2px 20px rgba(0,0,0,0.5);">Pra sempre, nós dois.</h2>
-      <p class="text-center anim-fadeUp s3" style="color:rgba(255,255,255,0.8);font-size:15px;line-height:1.8;text-shadow:0 1px 8px rgba(0,0,0,0.5);max-width:320px;">De Lagoa Santa ao infinito. Cada dia ao seu lado é uma página do melhor livro que já existiu. Obrigado por ser meu mundo. Eu te amo. 💜</p>
-      <div class="font-caveat anim-fadeUp s4" style="font-size:28px;color:rgba(255,255,255,0.6);text-shadow:0 1px 8px rgba(0,0,0,0.5);">— Gabriel 💌</div>
+      <h2 class="font-outfit font-bold text-3xl text-center anim-fadeUp s2"
+        style="text-shadow:0 2px 20px rgba(0,0,0,0.5);">Pra sempre, nós dois.</h2>
+      <p class="text-center anim-fadeUp s3"
+        style="color:rgba(255,255,255,0.8);font-size:15px;line-height:1.8;text-shadow:0 1px 8px rgba(0,0,0,0.5);max-width:320px;">
+        De Lagoa Santa ao infinito. Cada dia ao seu lado é uma página do melhor livro que já existiu. Obrigado por ser
+        meu mundo. Eu te amo. 💜</p>
+      <div class="font-caveat anim-fadeUp s4"
+        style="font-size:28px;color:rgba(255,255,255,0.6);text-shadow:0 1px 8px rgba(0,0,0,0.5);">— Gabriel 💌</div>
       <div class="flex flex-col gap-3 w-full max-w-xs anim-fadeUp s5">
         <button class="btn btn-r w-full justify-center" onclick="shareStory()">📤 Compartilhar</button>
         <button class="btn btn-o w-full justify-center" onclick="goTo(0)">↩ Voltar ao Início</button>
@@ -521,7 +1356,7 @@
     const audio = document.getElementById('audioPlayer');
     function toggleAudio() {
       if (audio.paused) {
-        audio.play().then(() => { document.getElementById('playIcon').textContent = '⏸'; document.getElementById('floatAudio').classList.add('playing'); document.getElementById('floatAudio').textContent = '🎶'; }).catch(() => {});
+        audio.play().then(() => { document.getElementById('playIcon').textContent = '⏸'; document.getElementById('floatAudio').classList.add('playing'); document.getElementById('floatAudio').textContent = '🎶'; }).catch(() => { });
       } else { audio.pause(); document.getElementById('playIcon').textContent = '▶'; document.getElementById('floatAudio').classList.remove('playing'); document.getElementById('floatAudio').textContent = '🎵'; }
     }
     audio.addEventListener('timeupdate', () => { if (audio.duration) { document.getElementById('progFill').style.width = (audio.currentTime / audio.duration) * 100 + '%'; const m = Math.floor(audio.currentTime / 60), s = Math.floor(audio.currentTime % 60); document.getElementById('curTime').textContent = m + ':' + (s < 10 ? '0' : '') + s; } });
@@ -585,7 +1420,7 @@
         }
         grid.appendChild(row);
       }
-      const rows = [['Q','W','E','R','T','Y','U','I','O','P'], ['A','S','D','F','G','H','J','K','L'], ['⏎','Z','X','C','V','B','N','M','⌫']];
+      const rows = [['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'], ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'], ['⏎', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '⌫']];
       const kb = document.getElementById('keyboard');
       rows.forEach(r => {
         const row = document.createElement('div'); row.className = 'flex gap-1 justify-center';
@@ -702,14 +1537,39 @@
         card.style.transform = 'scale(' + (1 - i * 0.04) + ') translateY(' + (i * 8) + 'px)';
         if (i > 0) card.style.opacity = Math.max(0.3, 1 - i * 0.2);
         card.innerHTML = '<img src="' + p.src + '" alt=""><div class="card-caption">' + p.caption + '</div>';
-        card.addEventListener('click', () => nextCard());
+        
+        let startX = 0, currentX = 0, isDragging = false;
+        card.addEventListener('pointerdown', (e) => {
+          if (i !== stackIdx) return;
+          isDragging = true; startX = e.clientX; currentX = 0;
+          card.style.transition = 'none';
+          card.setPointerCapture(e.pointerId);
+        });
+        card.addEventListener('pointermove', (e) => {
+          if (!isDragging) return;
+          currentX = e.clientX - startX;
+          card.style.transform = `scale(1) translateY(0px) translateX(${currentX}px) rotate(${currentX * 0.05}deg)`;
+        });
+        const endDrag = (e) => {
+          if (!isDragging) return;
+          isDragging = false;
+          card.releasePointerCapture(e.pointerId);
+          card.style.transition = 'transform .5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity .4s';
+          if (Math.abs(currentX) > 80) nextCard(Math.sign(currentX));
+          else card.style.transform = 'scale(1) translateY(0px)';
+        };
+        card.addEventListener('pointerup', endDrag);
+        card.addEventListener('pointercancel', endDrag);
+        
         container.appendChild(card);
       });
+      document.getElementById('s-7').querySelector('p.text-sm').textContent = 'Arraste para os lados para passar a foto';
     }
-    function nextCard() {
+    function nextCard(dir = -1) {
       const cards = document.querySelectorAll('.stack-card');
       if (stackIdx >= cards.length) return;
-      cards[stackIdx].style.transform = 'translateX(-120%) rotate(-15deg)'; cards[stackIdx].style.opacity = '0';
+      cards[stackIdx].style.transform = `translateX(${dir * 150}%) rotate(${dir * 20}deg)`; 
+      cards[stackIdx].style.opacity = '0';
       stackIdx++;
       document.getElementById('stackCounter').textContent = Math.min(stackIdx + 1, cards.length) + ' / ' + cards.length;
       cards.forEach((c, i) => { if (i >= stackIdx) { const o = i - stackIdx; c.style.transform = 'scale(' + (1 - o * 0.04) + ') translateY(' + (o * 8) + 'px)'; c.style.opacity = Math.max(0.3, 1 - o * 0.2); c.style.zIndex = cards.length - o; } });
@@ -782,9 +1642,10 @@
 
     // ===== SHARE =====
     function shareStory() {
-      if (navigator.share) { navigator.share({ title: 'Nossa História 💜', text: C.n1 + ' e ' + C.n2, url: location.href }).catch(() => {}); }
-      else { navigator.clipboard.writeText(location.href).then(() => { const b = event.target; const o = b.textContent; b.textContent = '✅ Copiado!'; setTimeout(() => b.textContent = o, 2000); }).catch(() => {}); }
+      if (navigator.share) { navigator.share({ title: 'Nossa História 💜', text: C.n1 + ' e ' + C.n2, url: location.href }).catch(() => { }); }
+      else { navigator.clipboard.writeText(location.href).then(() => { const b = event.target; const o = b.textContent; b.textContent = '✅ Copiado!'; setTimeout(() => b.textContent = o, 2000); }).catch(() => { }); }
     }
   </script>
 </body>
+
 </html>
