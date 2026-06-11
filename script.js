@@ -223,7 +223,9 @@ if (mapCanvas) {
     regenerateStars();
 
     function animate() {
-        drawMap();
+        if (typeof cur !== 'undefined' && cur === 4) {
+            drawMap();
+        }
         requestAnimationFrame(animate);
     }
     animate();
