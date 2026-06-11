@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#0a0a0a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -642,6 +643,7 @@
       cursor: grab;
       touch-action: none;
     }
+
     .stack-card:active {
       cursor: grabbing;
     }
@@ -901,6 +903,34 @@
       pointer-events: none;
       animation: confettiFall 3s linear forwards;
     }
+  
+    .star-map-container {
+      position: relative;
+      width: 250px;
+      height: 250px;
+      margin: 0 auto 1rem;
+      border-radius: 50%;
+      box-shadow: 0 0 40px rgba(160, 196, 255, 0.1);
+    }
+    
+    #starMap {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, #0a1128 0%, #03050a 100%);
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+    }
+    
+    .overlay-ring {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      pointer-events: none;
+    }
   </style>
 </head>
 
@@ -931,17 +961,47 @@
       </div>
       <div class="flex items-center justify-center gap-6 w-full anim-fadeUp s4">
         <button class="pbtn">🔀</button><button class="pbtn" style="font-size:24px;">⏮</button>
-        <button class="play-btn" onclick="toggleAudio()"><span
-            id="playIcon"><svg width="28" height="28" viewBox="0 0 24 24" fill="black"><path d="M8 5v14l11-7z"/></svg></span></button>
+        <button class="play-btn" onclick="toggleAudio()"><span id="playIcon"><svg width="28" height="28"
+              viewBox="0 0 24 24" fill="black">
+              <path d="M8 5v14l11-7z" />
+            </svg></span></button>
         <button class="pbtn" style="font-size:24px;">⏭</button><button class="pbtn">🔁</button>
       </div>
-      <button class="btn btn-g anim-fadeUp s5" onclick="goTo(1)" style="padding:10px 24px;border-radius:24px;">Sobre o
-        casal →</button>
+      <button class="btn btn-g anim-fadeUp s5" onclick="goTo(1)" style="padding:10px 24px;border-radius:24px;">Abra seu presente. 🎁</button>
     </div>
   </section>
 
-  <!-- ===== 1 — STATS ===== -->
-  <section class="screen" id="s-1" style="background:linear-gradient(180deg,#0d1f0d,#0a0a0a 60%);">
+
+  <!-- ===== 1 — PRESENTE ===== -->
+  <section class="screen" id="s-1" style="background:linear-gradient(180deg,#2a0812,#0a0a0a 80%); overflow-y:auto; padding-bottom: 2rem;">
+    <div class="flex flex-col items-center min-h-screen px-6 py-16 gap-6 w-full max-w-sm" style="margin:0 auto;">
+      <div class="anim-fadeUp s1" style="width:100%; text-align:center;">
+        <h2 class="font-caveat text-4xl text-center" style="color:#ff4d8d; text-shadow: 0 0 15px rgba(255,77,141,0.4); margin-bottom: 1.5rem;">Feliz Dia dos Namorados!</h2>
+        
+        <div class="glass p-6 w-full text-left" style="line-height: 1.9; font-size: 17px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,77,141,0.2); box-shadow: 0 0 30px rgba(255,77,141,0.05); font-family: 'Caveat', cursive;">
+          <p class="mb-4 text-white">
+            Feliz Dia dos Namorados, meu amor. Esse site é só uma das formas que eu encontrei de te agradecer por todo o apoio, pela parceria e por cada momento de alegria que você entrega na minha vida todos os dias. Estar do seu lado faz tudo ficar mais leve.
+          </p>
+          <p class="mb-4 text-white">
+            Você é, sem dúvidas, o melhor presente que Deus colocou na minha vida, e sou grato a Ele todas as noites por ter cruzado os nossos caminhos.
+          </p>
+          <p class="mb-4 text-white">
+            Desejo do fundo do meu coração que esse dia seja só mais um de tantos e tantos outros que ainda vamos viver juntos. E que, com o passar dos anos, a gente nunca perca esse carinho, essa nossa cumplicidade e o empenho de fazer de tudo para alegrar a vida do outro.
+          </p>
+          <p class="mb-4 text-white">
+            Você é o grande amor da minha vida e eu quero que você entenda e sinta isso de todas as formas possíveis, todos os dias. Obrigado por ser essa companheira incrível, a melhor namorada e a minha futura esposa do mundo.
+          </p>
+          <p class="font-bold text-center" style="color:#ff4d8d; font-size:18px;">
+            Eu te amo mais que tudo nesse mundo. ❤️
+          </p>
+        </div>
+      </div>
+      <button class="btn btn-g anim-fadeUp s3 mt-4" onclick="goTo(2)" style="background:#ff4d8d; color:white; border:none; box-shadow: 0 0 15px rgba(255,77,141,0.5);">Nossa Jornada →</button>
+    </div>
+  </section>
+
+  <!-- ===== 2 — STATS ===== -->
+  <section class="screen" id="s-2" style="background:linear-gradient(180deg,#0d1f0d,#0a0a0a 60%);">
     <div class="flex flex-col items-center min-h-screen px-6 py-16 gap-5 w-full max-w-sm">
       <div class="anim-fadeUp s1"
         style="width:80px;height:80px;border-radius:50%;overflow:hidden;border:3px solid rgba(29,185,84,0.4);">
@@ -993,16 +1053,16 @@
           querer ser melhor a cada novo dia. Cada momento ao seu lado é único e especial. Eu te amo mais do que palavras
           podem expressar. 💜</p>
       </div>
-      <button class="btn btn-g anim-fadeUp s6" onclick="goTo(2)">Continuar →</button>
+      <button class="btn btn-g anim-fadeUp s6" onclick="goTo(3)">Continuar →</button>
     </div>
   </section>
 
-  <!-- ===== 2 — INTRO WRAPPED ===== -->
-  <section class="screen" id="s-2" style="background:linear-gradient(180deg,#0a1a2e,#0a0a0a 70%);">
+  <!-- ===== 3 — INTRO WRAPPED ===== -->
+  <section class="screen" id="s-3" style="background:linear-gradient(180deg,#0a1a2e,#0a0a0a 70%);">
     <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-6 w-full max-w-sm">
       <div class="text-5xl anim-fadeUp s1">💜</div>
       <h2 class="font-outfit font-bold text-2xl text-center anim-fadeUp s2">Seu Love Wrapped</h2>
-      <p class="font-outfit font-bold text-center anim-fadeUp s2" style="color:#1DB954;font-size:18px;">2024 chegou!</p>
+      <p class="font-outfit font-bold text-center anim-fadeUp s2" style="color:#1DB954;font-size:18px;">2026 chegou!</p>
       <div class="glass p-5 w-full anim-fadeUp s3">
         <div class="text-center mb-4">
           <div class="wrapped-counter" id="wrDays">0</div>
@@ -1025,44 +1085,48 @@
       </div>
       <p class="font-caveat text-center anim-fadeUp s4" style="font-size:22px;color:rgba(255,255,255,0.5);">"Cada
         segundo com você vale a eternidade" ✨</p>
-      <button class="btn btn-p anim-fadeUp s5" onclick="goTo(3)">Continuar →</button>
+      <button class="btn btn-p anim-fadeUp s5" onclick="goTo(4)">Continuar →</button>
     </div>
   </section>
 
-  <!-- ===== 3 — UNIVERSO ALINHADO ===== -->
-  <section class="screen" id="s-3" style="background:linear-gradient(180deg,#050520,#0a0a1a);">
+  <!-- ===== 4 — UNIVERSO ALINHADO ===== -->
+  <section class="screen" id="s-4" style="background:linear-gradient(180deg,#050520,#0a0a1a);">
     <div class="star-field" id="uniStars"></div>
     <svg class="constellation-canvas" id="constSvg" style="z-index:1;"></svg>
     <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-6 w-full max-w-sm"
       style="position:relative;z-index:2;">
-      <div class="text-5xl anim-fadeUp s1" style="animation:float 3s ease-in-out infinite;">🌌</div>
+      <div class="anim-fadeUp s1">
+        <div class="star-map-container">
+          <canvas id="starMap"></canvas>
+          <div class="overlay-ring"></div>
+        </div>
+      </div>
       <h2 class="font-outfit font-bold text-2xl text-center anim-fadeUp s2">O Universo Estava<br>Alinhado</h2>
       <p class="text-center text-sm anim-fadeUp s3" style="color:rgba(255,255,255,0.5);">23 de Dezembro de 2023, Lagoa
-        Santa. As estrelas conspiraram para que nos encontrássemos.</p>
+        Santa. As constelações conspiraram para que nos encontrássemos.</p>
       <div class="glass p-5 w-full anim-fadeUp s4">
-        <div class="flex items-center gap-3 mb-3">
-          <span style="font-size:28px;">🌙</span>
+        <div class="flex items-center justify-center gap-4">
+          <svg width="32" height="32" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="#0a1128" />
+            <circle cx="30" cy="40" r="2" fill="#fff" />
+            <circle cx="50" cy="30" r="3" fill="#fff" />
+            <circle cx="70" cy="60" r="2" fill="#fff" />
+            <path d="M 30 40 L 50 30 L 70 60" stroke="#fff" stroke-width="1" fill="none" opacity="0.6"/>
+          </svg>
           <div>
-            <p class="font-outfit font-semibold text-sm">Fase da Lua</p>
-            <p class="text-xs" style="color:rgba(255,255,255,0.5);">Gibosa Crescente — 23/12/2023</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-3">
-          <span style="font-size:28px;">♑</span>
-          <div>
-            <p class="font-outfit font-semibold text-sm">Signo do Dia</p>
-            <p class="text-xs" style="color:rgba(255,255,255,0.5);">Capricórnio ☀️ — início de uma nova era</p>
+            <p class="font-outfit font-semibold text-sm">Céu Noturno</p>
+            <p class="text-xs" style="color:rgba(255,255,255,0.5);">Estrelas de 23/12/2023</p>
           </div>
         </div>
       </div>
       <p class="font-caveat text-center anim-fadeUp s5" style="font-size:20px;color:rgba(255,255,255,0.4);">As
         constelações desenharam nosso destino ✨</p>
-      <button class="btn btn-p anim-fadeUp s6" onclick="goTo(4)">Continuar →</button>
+      <button class="btn btn-p anim-fadeUp s6" onclick="goTo(5)">Continuar →</button>
     </div>
   </section>
 
-  <!-- ===== 4 — WORDLE (SORRISO) ===== -->
-  <section class="screen" id="s-4" style="background:linear-gradient(180deg,#1a0f0a,#0a0a0a 60%);">
+  <!-- ===== 5 — WORDLE (SORRISO) ===== -->
+  <section class="screen" id="s-5" style="background:linear-gradient(180deg,#1a0f0a,#0a0a0a 60%);">
     <div class="flex flex-col items-center justify-center min-h-screen px-5 py-14 gap-3 w-full max-w-sm">
       <div class="text-3xl anim-fadeUp s1">💝</div>
       <h2 class="font-outfit font-bold text-xl text-center anim-fadeUp s2">Algo que amo em você</h2>
@@ -1072,13 +1136,13 @@
       <div id="wordleMsg" class="text-center font-outfit font-bold text-sm" style="min-height:24px;color:#1DB954;">
       </div>
       <div class="flex flex-col gap-1 w-full anim-fadeUp s5" id="keyboard"></div>
-      <button class="btn btn-g anim-fadeUp s6" id="wordleNext" onclick="goTo(5)" disabled>🔒 Acerte para
+      <button class="btn btn-g anim-fadeUp s6" id="wordleNext" onclick="goTo(6)" disabled>🔒 Acerte para
         continuar</button>
     </div>
   </section>
 
-  <!-- ===== 5 — NOSSA JORNADA ===== -->
-  <section class="screen" id="s-5" style="background:linear-gradient(180deg,#0f0f1a,#0a0a0a 50%);">
+  <!-- ===== 6 — NOSSA JORNADA ===== -->
+  <section class="screen" id="s-6" style="background:linear-gradient(180deg,#0f0f1a,#0a0a0a 50%);">
     <div class="flex flex-col items-center px-5 py-16 gap-4 w-full max-w-sm" style="min-height:100vh;">
       <h2 class="font-outfit font-bold text-2xl text-center anim-fadeUp s1">Nossa Jornada</h2>
       <p class="text-center anim-fadeUp s2" style="color:rgba(255,255,255,0.4);font-size:13px;">Cada momento que nos
@@ -1122,14 +1186,14 @@
         </div>
       </div>
       <div class="flex gap-3 mt-4 pb-8">
-        <button class="btn btn-o" onclick="goTo(4)">← Voltar</button>
-        <button class="btn btn-g" onclick="goTo(6)">Continuar →</button>
+        <button class="btn btn-o" onclick="goTo(5)">← Voltar</button>
+        <button class="btn btn-g" onclick="goTo(7)">Continuar →</button>
       </div>
     </div>
   </section>
 
-  <!-- ===== 6 — MAPA ===== -->
-  <section class="screen" id="s-6" style="background:linear-gradient(180deg,#0a1a0a,#0a0a0a 60%);">
+  <!-- ===== 7 — MAPA ===== -->
+  <section class="screen" id="s-7" style="background:linear-gradient(180deg,#0a1a0a,#0a0a0a 60%);">
     <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-5 w-full max-w-sm">
       <div class="text-4xl anim-fadeUp s1">📍</div>
       <h2 class="font-outfit font-bold text-2xl text-center anim-fadeUp s2">Nossos Lugares</h2>
@@ -1158,12 +1222,12 @@
           </div>
         </div>
       </div>
-      <button class="btn btn-g anim-fadeUp s6" onclick="goTo(7)">Continuar →</button>
+      <button class="btn btn-g anim-fadeUp s6" onclick="goTo(8)">Continuar →</button>
     </div>
   </section>
 
-  <!-- ===== 7 — PHOTO STACK ===== -->
-  <section class="screen" id="s-7" style="background:linear-gradient(180deg,#1a0a1a,#0a0a0a 60%);">
+  <!-- ===== 8 — PHOTO STACK ===== -->
+  <section class="screen" id="s-8" style="background:linear-gradient(180deg,#1a0a1a,#0a0a0a 60%);">
     <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-5 w-full max-w-sm">
       <h2 class="font-outfit font-bold text-2xl text-center anim-fadeUp s1">Nossos Momentos 📸</h2>
       <p class="text-center text-sm anim-fadeUp s2" style="color:rgba(255,255,255,0.5);">Toque para ver a próxima foto
@@ -1171,12 +1235,12 @@
       <div class="photo-stack anim-fadeUp s3" id="photoStack"></div>
       <p class="font-caveat text-center anim-fadeUp s4" style="font-size:18px;color:rgba(255,255,255,0.4);"
         id="stackCounter">1 / 6</p>
-      <button class="btn btn-r anim-fadeUp s5" onclick="goTo(8)">Continuar →</button>
+      <button class="btn btn-r anim-fadeUp s5" onclick="goTo(9)">Continuar →</button>
     </div>
   </section>
 
-  <!-- ===== 8 — SAUDADES ===== -->
-  <section class="screen" id="s-8" style="background:linear-gradient(180deg,#1a0a2e,#0a0a0a 60%);">
+  <!-- ===== 9 — SAUDADES ===== -->
+  <section class="screen" id="s-9" style="background:linear-gradient(180deg,#1a0a2e,#0a0a0a 60%);">
     <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-6 w-full max-w-sm">
       <h2 class="font-outfit font-bold text-xl text-center anim-fadeUp s1">Saudades de momentos 😊</h2>
       <p class="text-center text-sm anim-fadeUp s2" style="color:rgba(255,255,255,0.6);line-height:1.7;">Muitos momentos
@@ -1185,12 +1249,12 @@
           style="max-height:380px;"></div>
       <p class="font-caveat text-center anim-fadeUp s4" style="font-size:22px;color:rgba(255,255,255,0.5);">"Que saudade
         de viver tudo de novo..." 💜</p>
-      <button class="btn btn-r anim-fadeUp s5" onclick="goTo(9)">Ver mais →</button>
+      <button class="btn btn-r anim-fadeUp s5" onclick="goTo(10)">Ver mais →</button>
     </div>
   </section>
 
-  <!-- ===== 9 — QUE CASAL LINDO ===== -->
-  <section class="screen" id="s-9" style="background:linear-gradient(180deg,#0f1a0f,#0a0a0a 60%);">
+  <!-- ===== 10 — QUE CASAL LINDO ===== -->
+  <section class="screen" id="s-10" style="background:linear-gradient(180deg,#0f1a0f,#0a0a0a 60%);">
     <div class="flex flex-col items-center min-h-screen px-6 py-16 gap-4 w-full max-w-sm">
       <h2 class="font-outfit font-bold text-xl text-center anim-fadeUp s1">Que casal lindo! 😍</h2>
       <p class="anim-fadeUp s2" style="color:rgba(255,255,255,0.4);font-size:13px;">(só isso mesmo)</p>
@@ -1216,12 +1280,12 @@
       </div>
       <p class="font-caveat text-center anim-fadeUp s6" style="font-size:20px;color:rgba(255,255,255,0.5);">Cada foto
         conta uma parte da nossa história ✨</p>
-      <button class="btn btn-g anim-fadeUp s7" onclick="goTo(10)">Próximo →</button>
+      <button class="btn btn-g anim-fadeUp s7" onclick="goTo(11)">Próximo →</button>
     </div>
   </section>
 
-  <!-- ===== 10 — ROLETA ===== -->
-  <section class="screen" id="s-10" style="background:linear-gradient(180deg,#1a0f1a,#0a0a0a 60%);">
+  <!-- ===== 11 — ROLETA ===== -->
+  <section class="screen" id="s-11" style="background:linear-gradient(180deg,#1a0f1a,#0a0a0a 60%);">
     <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-5 w-full max-w-sm">
       <div class="text-4xl anim-fadeUp s1">🎰</div>
       <h2 class="font-outfit font-bold text-xl text-center anim-fadeUp s2">Roleta de Encontros</h2>
@@ -1235,12 +1299,12 @@
         <p class="font-outfit font-bold text-lg text-center" id="wheelResTxt"></p>
         <p class="font-caveat text-center mt-2" style="font-size:18px;color:rgba(255,255,255,0.5);">Bora marcar? 💜</p>
       </div>
-      <button class="btn btn-g anim-fadeUp s6" onclick="goTo(11)">Próximo →</button>
+      <button class="btn btn-g anim-fadeUp s6" onclick="goTo(12)">Próximo →</button>
     </div>
   </section>
 
-  <!-- ===== 11 — CONQUISTA ===== -->
-  <section class="screen" id="s-11" style="background:linear-gradient(180deg,#0f0a2e,#0a0a0a 60%);">
+  <!-- ===== 12 — CONQUISTA ===== -->
+  <section class="screen" id="s-12" style="background:linear-gradient(180deg,#0f0a2e,#0a0a0a 60%);">
     <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-5 w-full max-w-sm">
       <div class="text-4xl anim-fadeUp s1">🏆</div>
       <h2 class="font-outfit font-bold text-xl text-center anim-fadeUp s2">Conquista Desbloqueada!</h2>
@@ -1264,12 +1328,12 @@
           </div>
         </div>
       </div>
-      <button class="btn btn-g anim-fadeUp s5" onclick="goTo(12)">Ver final →</button>
+      <button class="btn btn-g anim-fadeUp s5" onclick="goTo(13)">Ver final →</button>
     </div>
   </section>
 
-  <!-- ===== 12 — FINAL ===== -->
-  <section class="screen" id="s-12" style="background:#000;">
+  <!-- ===== 13 — FINAL ===== -->
+  <section class="screen" id="s-13" style="background:#000;">
     <div class="final-bg" style="background-image:url('foto5.png');" id="finalBg"></div>
     <div class="final-content flex flex-col items-center justify-center min-h-screen px-8 gap-6"
       style="position:relative;z-index:10;">
@@ -1278,7 +1342,7 @@
         style="text-shadow:0 2px 20px rgba(0,0,0,0.5);">Pra sempre, nós dois.</h2>
       <p class="text-center anim-fadeUp s3"
         style="color:rgba(255,255,255,0.8);font-size:15px;line-height:1.8;text-shadow:0 1px 8px rgba(0,0,0,0.5);max-width:320px;">
-        De Lagoa Santa ao infinito. Cada dia ao seu lado é uma página do melhor livro que já existiu. Obrigado por ser
+        Você é a lua da minha vida. Cada dia ao seu lado é uma página do melhor livro que já existiu. Obrigado por ser
         meu mundo. Eu te amo. 💜</p>
       <div class="font-caveat anim-fadeUp s4"
         style="font-size:28px;color:rgba(255,255,255,0.6);text-shadow:0 1px 8px rgba(0,0,0,0.5);">— Gabriel 💌</div>
@@ -1293,7 +1357,7 @@
   <script>
     // ===== CONFIG =====
     const C = { n1: 'Gabriel', n2: 'Ester', start: new Date('2024-01-14T00:00:00-03:00'), met: new Date('2023-12-23T00:00:00-03:00') };
-    const TOTAL = 13;
+    const TOTAL = 14;
     let cur = 0, transitioning = false, mapInit = false, uniInit = false;
 
     document.getElementById('names').textContent = C.n1 + ' e ' + C.n2;
@@ -1307,7 +1371,7 @@
     function goTo(i) {
       if (transitioning || i === cur || i < 0 || i >= TOTAL) return;
       // Block leaving wordle if not solved
-      if (cur === 4 && !wDone && i > cur) return;
+      if (cur === 5 && !wDone && i > cur) return;
       transitioning = true;
       const fwd = i > cur, old = document.getElementById('s-' + cur), nw = document.getElementById('s-' + i);
       nw.querySelectorAll('.anim-fadeUp').forEach(el => { el.style.animation = 'none'; el.offsetHeight; el.style.animation = ''; });
@@ -1318,13 +1382,13 @@
         old.classList.remove('exiting'); old.style.display = 'none'; old.style.opacity = ''; old.style.transform = '';
         nw.style.display = ''; nw.style.transform = ''; nw.classList.add('active');
         cur = i; updateDots(i); transitioning = false; nw.scrollTop = 0;
-        if (i === 2) initWrapped();
-        if (i === 3) initUniverse();
-        if (i === 4) initWordle();
-        if (i === 5) initTimeline();
-        if (i === 6 && !mapInit) initMap();
-        if (i === 7) initPhotoStack();
-        if (i === 12) launchConfetti();
+        if (i === 3) initWrapped();
+        if (i === 4) initUniverse();
+        if (i === 5) initWordle();
+        if (i === 6) initTimeline();
+        if (i === 7 && !mapInit) initMap();
+        if (i === 8) initPhotoStack();
+        if (i === 13) launchConfetti();
       }, 500);
     }
 
@@ -1384,14 +1448,15 @@
     function initUniverse() {
       if (uniInit) return; uniInit = true;
       const field = document.getElementById('uniStars'), points = [];
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 12; i++) {
+        const x = 10 + Math.random() * 80, y = 10 + Math.random() * 80;
+        points.push({ x: x * window.innerWidth / 100, y: y * window.innerHeight / 100 });
         const s = document.createElement('div'); s.className = 'star';
-        const x = Math.random() * 100, y = Math.random() * 100;
         s.style.left = x + '%'; s.style.top = y + '%';
-        s.style.width = (1 + Math.random() * 3) + 'px'; s.style.height = s.style.width;
+        s.style.width = '3px'; s.style.height = '3px';
+        s.style.boxShadow = '0 0 8px 2px rgba(255,255,255,0.8)';
         s.style.animationDelay = Math.random() * 3 + 's'; s.style.animationDuration = (2 + Math.random() * 3) + 's';
         field.appendChild(s);
-        if (i < 8) points.push({ x: x * window.innerWidth / 100, y: y * window.innerHeight / 100 });
       }
       const svg = document.getElementById('constSvg');
       svg.setAttribute('width', window.innerWidth); svg.setAttribute('height', window.innerHeight);
@@ -1399,10 +1464,10 @@
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('x1', points[i].x); line.setAttribute('y1', points[i].y);
         line.setAttribute('x2', points[i + 1].x); line.setAttribute('y2', points[i + 1].y);
-        line.setAttribute('stroke', 'rgba(255,255,255,0.15)'); line.setAttribute('stroke-width', '1');
+        line.setAttribute('stroke', 'rgba(255,255,255,0.3)'); line.setAttribute('stroke-width', '1.5');
         line.setAttribute('stroke-dasharray', '1000'); line.setAttribute('stroke-dashoffset', '1000');
         line.style.animation = 'constellationDraw 2s ease forwards';
-        line.style.animationDelay = (i * 0.3) + 's';
+        line.style.animationDelay = (i * 0.4) + 's';
         svg.appendChild(line);
       }
     }
@@ -1505,12 +1570,17 @@
 
     // ===== MAP =====
     function initMap() {
+      try {
       mapInit = true;
       const places = [
         { lat: -19.6322, lng: -43.8891, name: 'Lagoa Santa', desc: 'Onde tudo começou 💜', emoji: '💜' },
         { lat: -20.6731, lng: -40.4997, name: 'Guarapari', desc: 'Praia e pôr do sol 🌅', emoji: '🏖️' },
         { lat: -16.4435, lng: -39.0643, name: 'Porto Seguro', desc: 'Paraíso a dois 🌴', emoji: '🌴' },
       ];
+      const container = document.getElementById('mapContainer');
+      container.style.height = '250px';
+      container.style.width = '100%';
+      container.innerHTML = '';
       const map = L.map('mapContainer', { zoomControl: false, attributionControl: false }).setView([-18.5, -41.0], 6);
       L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
       places.forEach(p => {
@@ -1518,7 +1588,10 @@
         L.marker([p.lat, p.lng], { icon }).addTo(map).bindPopup('<div style="text-align:center;font-family:Outfit,sans-serif;"><b>' + p.name + '</b><br>' + p.desc + '</div>');
       });
       L.polyline(places.map(p => [p.lat, p.lng]), { color: '#1DB954', weight: 2, opacity: 0.5, dashArray: '8 8' }).addTo(map);
+      setTimeout(() => map.invalidateSize(), 100);
       setTimeout(() => map.invalidateSize(), 500);
+      setTimeout(() => map.invalidateSize(), 1500);
+      } catch(e) { console.error('Map init error:', e); }
     }
 
     // ===== PHOTO STACK =====
@@ -1540,7 +1613,7 @@
         card.style.transform = 'scale(' + (1 - i * 0.04) + ') translateY(' + (i * 8) + 'px)';
         if (i > 0) card.style.opacity = Math.max(0.3, 1 - i * 0.2);
         card.innerHTML = '<img src="' + p.src + '" alt=""><div class="card-caption">' + p.caption + '</div>';
-        
+
         let startX = 0, currentX = 0, isDragging = false;
         card.addEventListener('pointerdown', (e) => {
           if (i !== stackIdx) return;
@@ -1563,15 +1636,15 @@
         };
         card.addEventListener('pointerup', endDrag);
         card.addEventListener('pointercancel', endDrag);
-        
+
         container.appendChild(card);
       });
-      document.getElementById('s-7').querySelector('p.text-sm').textContent = 'Arraste para os lados para passar a foto';
+      document.getElementById('s-8').querySelector('p.text-sm').textContent = 'Arraste para os lados para passar a foto';
     }
     function nextCard(dir = -1) {
       const cards = document.querySelectorAll('.stack-card');
       if (stackIdx >= cards.length) return;
-      cards[stackIdx].style.transform = `translateX(${dir * 150}%) rotate(${dir * 20}deg)`; 
+      cards[stackIdx].style.transform = `translateX(${dir * 150}%) rotate(${dir * 20}deg)`;
       cards[stackIdx].style.opacity = '0';
       stackIdx++;
       document.getElementById('stackCounter').textContent = Math.min(stackIdx + 1, cards.length) + ' / ' + cards.length;
@@ -1649,6 +1722,7 @@
       else { navigator.clipboard.writeText(location.href).then(() => { const b = event.target; const o = b.textContent; b.textContent = '✅ Copiado!'; setTimeout(() => b.textContent = o, 2000); }).catch(() => { }); }
     }
   </script>
+  <script src="script.js"></script>
 </body>
 
 </html>
