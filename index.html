@@ -156,14 +156,11 @@
     }
 
     @keyframes twinkle {
-
-      0%,
-      100% {
-        opacity: 0.3;
+      0%, 100% {
+        opacity: 0.4;
       }
-
       50% {
-        opacity: 1;
+        opacity: 0.85;
       }
     }
 
@@ -206,10 +203,6 @@
     }
 
     @keyframes constellationDraw {
-      from {
-        stroke-dashoffset: 1000;
-      }
-
       to {
         stroke-dashoffset: 0;
       }
@@ -428,6 +421,30 @@
     .constellation-canvas {
       position: absolute;
       inset: 0;
+    }
+
+    @keyframes shootingStar {
+      0% {
+        transform: translateX(0) translateY(0) rotate(-45deg);
+        opacity: 1;
+      }
+      70% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(300px) translateY(300px) rotate(-45deg);
+        opacity: 0;
+      }
+    }
+
+    .shooting-star {
+      position: absolute;
+      width: 80px;
+      height: 1px;
+      background: linear-gradient(to right, rgba(255,255,255,0.8), transparent);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
     }
 
     /* ===== WORDLE ===== */
@@ -1447,29 +1464,125 @@
     // ===== UNIVERSE =====
     function initUniverse() {
       if (uniInit) return; uniInit = true;
-      const field = document.getElementById('uniStars'), points = [];
-      for (let i = 0; i < 12; i++) {
-        const x = 10 + Math.random() * 80, y = 10 + Math.random() * 80;
-        points.push({ x: x * window.innerWidth / 100, y: y * window.innerHeight / 100 });
+      const field = document.getElementById('uniStars');
+      const vw = window.innerWidth, vh = window.innerHeight;
+
+      // Tiny background stars scattered everywhere
+      for (let i = 0; i < 60; i++) {
         const s = document.createElement('div'); s.className = 'star';
-        s.style.left = x + '%'; s.style.top = y + '%';
-        s.style.width = '3px'; s.style.height = '3px';
-        s.style.boxShadow = '0 0 8px 2px rgba(255,255,255,0.8)';
-        s.style.animationDelay = Math.random() * 3 + 's'; s.style.animationDuration = (2 + Math.random() * 3) + 's';
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top = Math.random() * 100 + '%';
+        const sz = 0.5 + Math.random() * 1.2;
+        s.style.width = sz + 'px'; s.style.height = sz + 'px';
+        s.style.animationDelay = Math.random() * 5 + 's';
+        s.style.animationDuration = (3 + Math.random() * 4) + 's';
         field.appendChild(s);
       }
+
+      // Define constellation groups positioned around the edges
+      // Each group: { stars: [{x%, y%}], connections: [[i,j]], color }
+      const constellations = [
+        { // Bottom-left: a small triangle/sail shape
+          stars: [
+            {x: 5, y: 78}, {x: 12, y: 65}, {x: 20, y: 75},
+            {x: 15, y: 85}, {x: 28, y: 82}
+          ],
+          connections: [[0,1],[1,2],[2,3],[3,0],[2,4]]
+        },
+        { // Bottom-right: a zigzag / Cassiopeia-like
+          stars: [
+            {x: 70, y: 80}, {x: 78, y: 72}, {x: 82, y: 82},
+            {x: 90, y: 75}, {x: 95, y: 83}
+          ],
+          connections: [[0,1],[1,2],[2,3],[3,4]]
+        },
+        { // Top-right: a small diamond
+          stars: [
+            {x: 85, y: 15}, {x: 90, y: 25}, {x: 95, y: 15},
+            {x: 90, y: 8}
+          ],
+          connections: [[0,1],[1,2],[2,3],[3,0]]
+        },
+        { // Left side: little dipper-like
+          stars: [
+            {x: 2, y: 30}, {x: 8, y: 25}, {x: 14, y: 28},
+            {x: 12, y: 35}, {x: 6, y: 38}
+          ],
+          connections: [[0,1],[1,2],[2,3],[3,4],[4,0]]
+        },
+        { // Bottom-center: a gentle arc
+          stars: [
+            {x: 35, y: 90}, {x: 42, y: 85}, {x: 50, y: 88},
+            {x: 58, y: 85}, {x: 65, y: 90}
+          ],
+          connections: [[0,1],[1,2],[2,3],[3,4]]
+        },
+        { // Right side mid: small cross
+          stars: [
+            {x: 92, y: 45}, {x: 88, y: 50}, {x: 92, y: 55},
+            {x: 96, y: 50}
+          ],
+          connections: [[0,1],[1,2],[0,3],[3,2]]
+        }
+      ];
+
       const svg = document.getElementById('constSvg');
-      svg.setAttribute('width', window.innerWidth); svg.setAttribute('height', window.innerHeight);
-      for (let i = 0; i < points.length - 1; i++) {
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', points[i].x); line.setAttribute('y1', points[i].y);
-        line.setAttribute('x2', points[i + 1].x); line.setAttribute('y2', points[i + 1].y);
-        line.setAttribute('stroke', 'rgba(255,255,255,0.3)'); line.setAttribute('stroke-width', '1.5');
-        line.setAttribute('stroke-dasharray', '1000'); line.setAttribute('stroke-dashoffset', '1000');
-        line.style.animation = 'constellationDraw 2s ease forwards';
-        line.style.animationDelay = (i * 0.4) + 's';
-        svg.appendChild(line);
+      svg.setAttribute('width', vw);
+      svg.setAttribute('height', vh);
+
+      let lineDelay = 0;
+      constellations.forEach((group, gi) => {
+        // Map % coords to pixel positions
+        const pts = group.stars.map(s => ({
+          x: s.x * vw / 100,
+          y: s.y * vh / 100
+        }));
+
+        // Draw constellation stars as bright glowing dots
+        group.stars.forEach((s, si) => {
+          const dot = document.createElement('div'); dot.className = 'star';
+          dot.style.left = s.x + '%'; dot.style.top = s.y + '%';
+          dot.style.width = '3px'; dot.style.height = '3px';
+          dot.style.background = '#fff';
+          dot.style.boxShadow = '0 0 3px 1px rgba(180,200,255,0.4)';
+          dot.style.animationDelay = (gi * 0.5 + si * 0.2) + 's';
+          dot.style.animationDuration = (2.5 + Math.random() * 2) + 's';
+          dot.style.zIndex = '3';
+          field.appendChild(dot);
+        });
+
+        // Draw constellation lines
+        group.connections.forEach(([a, b], li) => {
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', pts[a].x); line.setAttribute('y1', pts[a].y);
+          line.setAttribute('x2', pts[b].x); line.setAttribute('y2', pts[b].y);
+          line.setAttribute('stroke', 'rgba(160,190,255,0.25)');
+          line.setAttribute('stroke-width', '1');
+          line.setAttribute('stroke-linecap', 'round');
+          const len = Math.hypot(pts[b].x - pts[a].x, pts[b].y - pts[a].y);
+          line.setAttribute('stroke-dasharray', len);
+          line.setAttribute('stroke-dashoffset', len);
+          line.style.animation = `constellationDraw 1.5s ease forwards`;
+          line.style.animationDelay = (lineDelay + li * 0.3) + 's';
+          svg.appendChild(line);
+        });
+
+        lineDelay += group.connections.length * 0.15 + 0.3;
+      });
+
+      // Shooting star effect
+      function createShootingStar() {
+        const star = document.createElement('div');
+        star.className = 'shooting-star';
+        star.style.left = (10 + Math.random() * 60) + '%';
+        star.style.top = (5 + Math.random() * 30) + '%';
+        star.style.animation = `shootingStar ${1 + Math.random() * 0.5}s linear forwards`;
+        field.appendChild(star);
+        setTimeout(() => star.remove(), 2000);
       }
+      // First shooting star after a delay, then occasional ones
+      setTimeout(createShootingStar, 3000);
+      setInterval(() => { if (cur === 4) createShootingStar(); }, 5000 + Math.random() * 5000);
     }
 
     // ===== WORDLE =====
