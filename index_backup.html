@@ -1,0 +1,1935 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Nossa História 💜</title>
+  <meta name="description" content="Uma retrospectiva da nossa história de amor">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&family=Caveat:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: #050508;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      overscroll-behavior: none;
+    }
+
+    .font-outfit {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .font-caveat {
+      font-family: 'Caveat', cursive;
+    }
+
+    /* ===== SCREENS ===== */
+    .screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      transform: translateX(30px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .screen.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+      z-index: 10;
+    }
+
+    .screen.exiting {
+      opacity: 0;
+      transform: translateX(-30px);
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .screen::-webkit-scrollbar {
+      display: none;
+    }
+
+    .screen {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* ===== AMBIENT BACKGROUND EFFECTS ===== */
+    @keyframes ambientFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(30px, -20px) scale(1.05); }
+      50% { transform: translate(-20px, 15px) scale(0.95); }
+      75% { transform: translate(15px, 25px) scale(1.02); }
+    }
+
+    @keyframes ambientFloat2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-25px, 30px) scale(1.08); }
+      66% { transform: translate(20px, -15px) scale(0.92); }
+    }
+
+    @keyframes subtleShift {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.6; }
+    }
+
+    .screen::before,
+    .screen::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .screen::before {
+      width: 300px;
+      height: 300px;
+      top: -80px;
+      right: -60px;
+      animation: ambientFloat 12s ease-in-out infinite;
+    }
+
+    .screen::after {
+      width: 250px;
+      height: 250px;
+      bottom: -60px;
+      left: -50px;
+      animation: ambientFloat2 15s ease-in-out infinite;
+    }
+
+    /* Section-specific ambient colors */
+    #s-0::before { background: rgba(26, 26, 60, 0.5); }
+    #s-0::after { background: rgba(29, 185, 84, 0.08); }
+
+    #s-1::before { background: rgba(255, 77, 141, 0.12); }
+    #s-1::after { background: rgba(180, 40, 80, 0.1); }
+
+    #s-2::before { background: rgba(29, 185, 84, 0.1); }
+    #s-2::after { background: rgba(0, 212, 255, 0.06); }
+
+    #s-3::before { background: rgba(124, 58, 237, 0.1); }
+    #s-3::after { background: rgba(29, 185, 84, 0.08); }
+
+    #s-4::before { background: rgba(40, 50, 120, 0.15); }
+    #s-4::after { background: rgba(80, 100, 200, 0.08); }
+
+    #s-5::before { background: rgba(255, 150, 50, 0.08); }
+    #s-5::after { background: rgba(255, 77, 141, 0.06); }
+
+    #s-6::before { background: rgba(124, 58, 237, 0.08); }
+    #s-6::after { background: rgba(255, 77, 141, 0.06); }
+
+    #s-7::before { background: rgba(29, 185, 84, 0.1); }
+    #s-7::after { background: rgba(0, 180, 120, 0.06); }
+
+    #s-8::before { background: rgba(230, 57, 70, 0.1); }
+    #s-8::after { background: rgba(168, 85, 247, 0.08); }
+
+    #s-9::before { background: rgba(124, 58, 237, 0.12); }
+    #s-9::after { background: rgba(168, 85, 247, 0.06); }
+
+    #s-10::before { background: rgba(29, 185, 84, 0.08); }
+    #s-10::after { background: rgba(0, 212, 255, 0.06); }
+
+    #s-11::before { background: rgba(230, 57, 70, 0.1); }
+    #s-11::after { background: rgba(255, 77, 141, 0.08); }
+
+    #s-12::before { background: rgba(124, 58, 237, 0.15); }
+    #s-12::after { background: rgba(29, 185, 84, 0.08); }
+
+    #s-13::before { background: rgba(255, 77, 141, 0.1); }
+    #s-13::after { background: rgba(124, 58, 237, 0.08); }
+
+    /* Noise texture overlay for depth */
+    .screen > *:first-child {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== DOTS ===== */
+    .dots-container {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 4px;
+      z-index: 100;
+      padding: 5px 10px;
+      border-radius: 20px;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .dot.active {
+      background: #1DB954;
+      width: 18px;
+      border-radius: 3px;
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    @keyframes twinkle {
+      0%, 100% {
+        opacity: 0.4;
+      }
+      50% {
+        opacity: 0.85;
+      }
+    }
+
+    @keyframes glow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 20px rgba(29, 185, 84, 0.2);
+      }
+
+      50% {
+        box-shadow: 0 0 40px rgba(29, 185, 84, 0.5);
+      }
+    }
+
+    @keyframes holographic {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(-10vh) rotate(0deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(110vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes constellationDraw {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes popIn {
+      0% {
+        transform: scale(0) rotate(-10deg);
+        opacity: 0;
+      }
+
+      70% {
+        transform: scale(1.1) rotate(2deg);
+      }
+
+      100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0)
+      }
+
+      20% {
+        transform: translateX(-8px)
+      }
+
+      40% {
+        transform: translateX(8px)
+      }
+
+      60% {
+        transform: translateX(-5px)
+      }
+
+      80% {
+        transform: translateX(5px)
+      }
+    }
+
+    .anim-fadeUp {
+      animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+    }
+
+    .s1 {
+      animation-delay: .1s
+    }
+
+    .s2 {
+      animation-delay: .2s
+    }
+
+    .s3 {
+      animation-delay: .35s
+    }
+
+    .s4 {
+      animation-delay: .5s
+    }
+
+    .s5 {
+      animation-delay: .65s
+    }
+
+    .s6 {
+      animation-delay: .8s
+    }
+
+    .s7 {
+      animation-delay: .95s
+    }
+
+    /* ===== PLAYER ===== */
+    .album-art {
+      width: 260px;
+      height: 260px;
+      border-radius: 8px;
+      object-fit: cover;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .progress-bar-c {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #1DB954;
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.3s linear;
+    }
+
+    .pbtn {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 20px;
+      cursor: pointer;
+      padding: 8px;
+      transition: color .2s, transform .15s;
+    }
+
+    .pbtn:hover {
+      color: #fff;
+    }
+
+    .pbtn:active {
+      transform: scale(0.9);
+    }
+
+    .play-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      transition: transform .15s;
+    }
+
+    .play-btn:hover {
+      transform: scale(1.06);
+    }
+
+    .play-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* ===== GLASS ===== */
+    .glass {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+    }
+
+    /* ===== STATS ===== */
+    .stat-num {
+      font-family: 'Outfit';
+      font-size: 36px;
+      font-weight: 800;
+      line-height: 1;
+      background: linear-gradient(135deg, #fff, #e0e0e0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-lbl {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      margin-top: 4px;
+    }
+
+    /* ===== MESSAGE CARD ===== */
+    .msg-card {
+      background: linear-gradient(135deg, #e63946, #ff6b6b);
+      border-radius: 20px;
+      padding: 24px;
+      width: 100%;
+      box-shadow: 0 8px 32px rgba(230, 57, 70, 0.3);
+    }
+
+    /* ===== WRAPPED ===== */
+    .wrapped-counter {
+      font-family: 'Outfit';
+      font-size: 64px;
+      font-weight: 800;
+      line-height: 1;
+      background: linear-gradient(135deg, #1DB954, #00d4ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .wrapped-label {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: .2em;
+    }
+
+    /* ===== STARS ===== */
+    .star-field {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: #fff;
+      border-radius: 50%;
+      animation: twinkle 3s ease-in-out infinite;
+    }
+
+    .constellation-canvas {
+      position: absolute;
+      inset: 0;
+    }
+
+    @keyframes shootingStar {
+      0% {
+        transform: translateX(0) translateY(0) rotate(-45deg);
+        opacity: 1;
+      }
+      70% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(300px) translateY(300px) rotate(-45deg);
+        opacity: 0;
+      }
+    }
+
+    .shooting-star {
+      position: absolute;
+      width: 80px;
+      height: 1px;
+      background: linear-gradient(to right, rgba(255,255,255,0.8), transparent);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    /* ===== WORDLE ===== */
+    .wordle-row {
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+    }
+
+    .wordle-cell {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Outfit';
+      font-size: 18px;
+      font-weight: 700;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      transition: all .3s ease;
+      text-transform: uppercase;
+    }
+
+    .wordle-cell.correct {
+      background: #1DB954;
+      border-color: #1DB954;
+      animation: popIn .4s ease;
+    }
+
+    .wordle-cell.present {
+      background: #b59f3b;
+      border-color: #b59f3b;
+      animation: popIn .4s ease;
+    }
+
+    .wordle-cell.absent {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.08);
+      animation: popIn .4s ease;
+    }
+
+    .wordle-cell.active {
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .wordle-cell.filled {
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .wordle-shake {
+      animation: shake 0.4s ease;
+    }
+
+    .kb-key {
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-family: 'Outfit';
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+      min-width: 26px;
+    }
+
+    .kb-key:active {
+      transform: scale(0.9);
+    }
+
+    .kb-key.correct {
+      background: #1DB954;
+    }
+
+    .kb-key.present {
+      background: #b59f3b;
+    }
+
+    .kb-key.absent {
+      background: rgba(255, 255, 255, 0.03);
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* ===== TIMELINE ===== */
+    .tl-container {
+      position: relative;
+      padding: 20px 0;
+      width: 100%;
+    }
+
+    .tl-container::before {
+      content: '';
+      position: absolute;
+      left: 20px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.1), transparent);
+    }
+
+    .tl-entry {
+      position: relative;
+      padding-left: 48px;
+      margin-bottom: 32px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity .6s, transform .6s;
+    }
+
+    .tl-entry.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .tl-entry::before {
+      content: '💜';
+      position: absolute;
+      left: 10px;
+      top: 4px;
+      font-size: 14px;
+      z-index: 2;
+    }
+
+    .tl-date {
+      font-family: 'Outfit';
+      font-size: 14px;
+      font-weight: 700;
+      color: #ff4d8d;
+      margin-bottom: 6px;
+    }
+
+    .tl-text {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .polaroid {
+      background: #fff;
+      padding: 6px 6px 24px;
+      border-radius: 4px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      display: inline-block;
+      max-width: 220px;
+    }
+
+    .polaroid img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 2px;
+      display: block;
+    }
+
+    .polaroid .hw {
+      font-family: 'Caveat';
+      color: #333;
+      font-size: 16px;
+      text-align: center;
+      padding-top: 6px;
+    }
+
+    .p1 {
+      transform: rotate(-2deg)
+    }
+
+    .p2 {
+      transform: rotate(1.5deg)
+    }
+
+    .p3 {
+      transform: rotate(-1deg)
+    }
+
+    .p4 {
+      transform: rotate(2deg)
+    }
+
+    .p5 {
+      transform: rotate(-1.5deg)
+    }
+
+    /* ===== MAP ===== */
+    #mapContainer {
+      width: 100%;
+      height: 250px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* ===== PHOTO STACK ===== */
+    .photo-stack {
+      position: relative;
+      width: 260px;
+      height: 340px;
+      perspective: 600px;
+    }
+
+    .stack-card {
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      transition: transform .5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity .4s;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .stack-card:active {
+      cursor: grabbing;
+    }
+
+    .stack-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .stack-card .card-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+      font-family: 'Caveat';
+      font-size: 20px;
+    }
+
+    /* ===== GALLERY ===== */
+    .gal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .gal-item {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      aspect-ratio: 3/4;
+    }
+
+    .gal-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .4s;
+    }
+
+    .gal-item:hover img {
+      transform: scale(1.05);
+    }
+
+    .gal-item.tall {
+      grid-row: span 2;
+    }
+
+    /* ===== WHEEL ===== */
+    .wheel-wrap {
+      position: relative;
+      width: 260px;
+      height: 260px;
+    }
+
+    .wheel-canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      box-shadow: 0 0 30px rgba(29, 185, 84, 0.2);
+    }
+
+    .wheel-ptr {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 28px;
+      z-index: 5;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    }
+
+    .wheel-result {
+      display: none;
+      text-align: center;
+      animation: fadeUp .6s ease forwards;
+    }
+
+    .wheel-result.show {
+      display: block;
+    }
+
+    /* ===== CONQUISTA ===== */
+    .holo-card-container {
+      perspective: 800px;
+      width: 280px;
+      height: 380px;
+      cursor: pointer;
+    }
+
+    .holo-card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform .8s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+
+    .holo-card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .holo-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      backface-visibility: hidden;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .holo-front {
+      background: linear-gradient(135deg, #0f0f2e, #1a0a3e, #0d1f3d);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 40px rgba(124, 58, 237, 0.2);
+    }
+
+    .holo-back {
+      transform: rotateY(180deg);
+      background: linear-gradient(135deg, #1a0a2e, #2d1b69, #0d1f3d);
+      border: 2px solid rgba(124, 58, 237, 0.3);
+    }
+
+    .holo-shimmer {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.05) 50%, transparent 70%);
+      background-size: 200% 200%;
+      animation: holographic 3s ease infinite;
+      pointer-events: none;
+    }
+
+    .holo-badge {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1DB954, #00d4ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      box-shadow: 0 0 30px rgba(29, 185, 84, 0.3);
+      animation: glow 2s ease infinite;
+    }
+
+    /* ===== FINAL ===== */
+    .final-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.35) blur(2px);
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 28px;
+      border-radius: 30px;
+      border: none;
+      font-family: 'Outfit';
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s, opacity .3s;
+    }
+
+    .btn:hover {
+      transform: scale(1.04);
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-g {
+      background: #1DB954;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(29, 185, 84, 0.3);
+    }
+
+    .btn-o {
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-r {
+      background: linear-gradient(135deg, #e63946, #ff6b6b);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(230, 57, 70, 0.3);
+    }
+
+    .btn-p {
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3);
+    }
+
+    .btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* ===== SECTION IMG ===== */
+    .sec-img {
+      width: 100%;
+      border-radius: 16px;
+      object-fit: cover;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    /* ===== FLOATING AUDIO ===== */
+    .float-audio {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      z-index: 200;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: rgba(29, 185, 84, 0.9);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(29, 185, 84, 0.4);
+      transition: transform .2s;
+      border: none;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .float-audio:hover {
+      transform: scale(1.1);
+    }
+
+    .float-audio.playing {
+      animation: pulse 2s ease infinite;
+    }
+
+    .confetti-piece {
+      position: fixed;
+      z-index: 300;
+      pointer-events: none;
+      animation: confettiFall 3s linear forwards;
+    }
+  
+    .star-map-container {
+      position: relative;
+      width: 250px;
+      height: 250px;
+      margin: 0 auto 1rem;
+      border-radius: 50%;
+      box-shadow: 0 0 40px rgba(160, 196, 255, 0.1);
+    }
+    
+    #starMap {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, #0a1128 0%, #03050a 100%);
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+    }
+    
+    .overlay-ring {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+  <audio id="audioPlayer" src="mirrors.mp3" preload="auto"></audio>
+  <div class="dots-container" id="dotsC"></div>
+  <button class="float-audio" id="floatAudio" onclick="toggleAudio()">🎵</button>
+
+  <!-- ===== 0 — PLAYER ===== -->
+  <section class="screen active" id="s-0" style="background: linear-gradient(160deg, #1a1a2e 0%, #0f0f20 30%, #0a0a12 60%, #050508 100%);">
+    <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-5 w-full max-w-sm">
+      <img src="foto1.jpg" alt="Nós" class="album-art anim-fadeUp s1">
+      <div class="w-full anim-fadeUp s2">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="font-outfit font-bold text-lg">Mirrors</h2>
+            <p class="text-sm" style="color:rgba(255,255,255,0.5)">Justin Timberlake</p>
+          </div>
+          <div style="color:#1DB954;font-size:20px;">✓</div>
+        </div>
+      </div>
+      <div class="w-full anim-fadeUp s3">
+        <div class="progress-bar-c" id="progBar">
+          <div class="progress-fill" id="progFill"></div>
+        </div>
+        <div class="flex justify-between mt-1"><span class="text-[10px]" style="color:rgba(255,255,255,0.4)"
+            id="curTime">0:00</span><span class="text-[10px]" style="color:rgba(255,255,255,0.4)">-8:31</span></div>
+      </div>
+      <div class="flex items-center justify-center gap-6 w-full anim-fadeUp s4">
+        <button class="pbtn">🔀</button><button class="pbtn" style="font-size:24px;">⏮</button>
+        <button class="play-btn" onclick="toggleAudio()"><span id="playIcon"><svg width="28" height="28"
+              viewBox="0 0 24 24" fill="black">
+              <path d="M8 5v14l11-7z" />
+            </svg></span></button>
+        <button class="pbtn" style="font-size:24px;">⏭</button><button class="pbtn">🔁</button>
+      </div>
+      <button class="btn btn-g anim-fadeUp s5" onclick="goTo(1)" style="padding:10px 24px;border-radius:24px;">Abra seu presente. 🎁</button>
+    </div>
+  </section>
+
+
+  <!-- ===== 1 — PRESENTE ===== -->
+  <section class="screen" id="s-1" style="background: linear-gradient(170deg, #2a0815 0%, #1a0610 25%, #10050a 50%, #050508 100%); overflow-y:auto; padding-bottom: 2rem;">
+    <div class="flex flex-col items-center min-h-screen px-6 py-16 gap-6 w-full max-w-sm" style="margin:0 auto;">
+      <div class="anim-fadeUp s1" style="width:100%; text-align:center;">
+        <h2 class="font-caveat text-4xl text-center" style="color:#ff4d8d; text-shadow: 0 0 15px rgba(255,77,141,0.4); margin-bottom: 1.5rem;">Feliz Dia dos Namorados!</h2>
+        
+        <div class="glass p-6 w-full text-left" style="line-height: 1.9; font-size: 17px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,77,141,0.2); box-shadow: 0 0 30px rgba(255,77,141,0.05); font-family: 'Caveat', cursive;">
+          <p class="mb-4 text-white">
+            Feliz Dia dos Namorados, meu amor. Esse site é só uma das formas que eu encontrei de te agradecer por todo o apoio, pela parceria e por cada momento de alegria que você entrega na minha vida todos os dias. Estar do seu lado faz tudo ficar mais leve.
+          </p>
+          <p class="mb-4 text-white">
+            Você é, sem dúvidas, o melhor presente que Deus colocou na minha vida, e sou grato a Ele todas as noites por ter cruzado os nossos caminhos.
+          </p>
+          <p class="mb-4 text-white">
+            Desejo do fundo do meu coração que esse dia seja só mais um de tantos e tantos outros que ainda vamos viver juntos. E que, com o passar dos anos, a gente nunca perca esse carinho, essa nossa cumplicidade e o empenho de fazer de tudo para alegrar a vida do outro.
+          </p>
+          <p class="mb-4 text-white">
+            Você é o grande amor da minha vida e eu quero que você entenda e sinta isso de todas as formas possíveis, todos os dias. Obrigado por ser essa companheira incrível, a melhor namorada e a minha futura esposa do mundo.
+          </p>
+          <p class="font-bold text-center" style="color:#ff4d8d; font-size:18px;">
+            Eu te amo mais que tudo nesse mundo. ❤️
+          </p>
+        </div>
+      </div>
+      <button class="btn btn-g anim-fadeUp s3 mt-4" onclick="goTo(2)" style="background:#ff4d8d; color:white; border:none; box-shadow: 0 0 15px rgba(255,77,141,0.5);">Nossa Jornada →</button>
+    </div>
+  </section>
+
+  <!-- ===== 2 — STATS ===== -->
+  <section class="screen" id="s-2" style="background: linear-gradient(165deg, #0d1f10 0%, #081408 30%, #060d06 55%, #050508 100%);">
+    <div class="flex flex-col items-center min-h-screen px-6 py-16 gap-5 w-full max-w-sm">
+      <div class="anim-fadeUp s1"
+        style="width:80px;height:80px;border-radius:50%;overflow:hidden;border:3px solid rgba(29,185,84,0.4);">
+        <img src="foto1.jpg" alt="Nós" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="text-center anim-fadeUp s2">
+        <h1 class="font-outfit font-bold text-2xl" id="names">Gabriel e Ester</h1>
+        <p class="text-sm mt-1" style="color:#1DB954;">Juntos desde 2024</p>
+      </div>
+      <div class="glass p-4 w-full anim-fadeUp s3">
+        <div class="flex items-center justify-around">
+          <div class="text-center flex-1">
+            <div class="stat-num" id="sA">0</div>
+            <div class="stat-lbl">Anos</div>
+          </div>
+          <div style="width:1px;height:40px;background:rgba(255,255,255,0.08);"></div>
+          <div class="text-center flex-1">
+            <div class="stat-num" id="sM">0</div>
+            <div class="stat-lbl">Meses</div>
+          </div>
+          <div style="width:1px;height:40px;background:rgba(255,255,255,0.08);"></div>
+          <div class="text-center flex-1">
+            <div class="stat-num" id="sD">0</div>
+            <div class="stat-lbl">Dias</div>
+          </div>
+        </div>
+      </div>
+      <div class="glass p-4 w-full anim-fadeUp s4">
+        <div class="flex items-center justify-around">
+          <div class="text-center flex-1">
+            <div class="stat-num" id="sH">0</div>
+            <div class="stat-lbl">Horas</div>
+          </div>
+          <div style="width:1px;height:40px;background:rgba(255,255,255,0.08);"></div>
+          <div class="text-center flex-1">
+            <div class="stat-num" id="sMi">0</div>
+            <div class="stat-lbl">Minutos</div>
+          </div>
+          <div style="width:1px;height:40px;background:rgba(255,255,255,0.08);"></div>
+          <div class="text-center flex-1">
+            <div class="stat-num" id="sS">0</div>
+            <div class="stat-lbl">Seg</div>
+          </div>
+        </div>
+      </div>
+      <div class="msg-card anim-fadeUp s5">
+        <p class="font-outfit font-bold text-sm mb-2" style="opacity:0.9;">Mensagem especial ❤️</p>
+        <p class="text-sm leading-relaxed" style="opacity:0.95;">Você é o amor da minha vida e a pessoa que me faz
+          querer ser melhor a cada novo dia. Cada momento ao seu lado é único e especial. Eu te amo mais do que palavras
+          podem expressar. 💜</p>
+      </div>
+      <button class="btn btn-g anim-fadeUp s6" onclick="goTo(3)">Continuar →</button>
+    </div>
+  </section>
+
+  <!-- ===== 3 — INTRO WRAPPED ===== -->
+  <section class="screen" id="s-3" style="background: linear-gradient(170deg, #0c1a30 0%, #08122a 30%, #060a18 55%, #050508 100%);">
+    <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-6 w-full max-w-sm">
+      <div class="text-5xl anim-fadeUp s1">💜</div>
+      <h2 class="font-outfit font-bold text-2xl text-center anim-fadeUp s2">Seu Love Wrapped</h2>
+      <p class="font-outfit font-bold text-center anim-fadeUp s2" style="color:#1DB954;font-size:18px;">2026 chegou!</p>
+      <div class="glass p-5 w-full anim-fadeUp s3">
+        <div class="text-center mb-4">
+          <div class="wrapped-counter" id="wrDays">0</div>
+          <div class="wrapped-label">dias juntos</div>
+        </div>
+        <div class="flex justify-around">
+          <div class="text-center">
+            <div class="font-outfit font-bold text-xl" style="color:#1DB954;" id="wrHours">0</div>
+            <div class="wrapped-label">horas</div>
+          </div>
+          <div class="text-center">
+            <div class="font-outfit font-bold text-xl" style="color:#ff4d8d;" id="wrKisses">∞</div>
+            <div class="wrapped-label">beijos</div>
+          </div>
+          <div class="text-center">
+            <div class="font-outfit font-bold text-xl" style="color:#a855f7;" id="wrSmiles">∞</div>
+            <div class="wrapped-label">sorrisos</div>
+          </div>
+        </div>
+      </div>
+      <p class="font-caveat text-center anim-fadeUp s4" style="font-size:22px;color:rgba(255,255,255,0.5);">"Cada
+        segundo com você vale a eternidade" ✨</p>
+      <button class="btn btn-p anim-fadeUp s5" onclick="goTo(4)">Continuar →</button>
+    </div>
+  </section>
+
+  <!-- ===== 4 — UNIVERSO ALINHADO ===== -->
+  <section class="screen" id="s-4" style="background: radial-gradient(ellipse at 50% 30%, #0c0c30 0%, #06061a 40%, #030310 70%, #020208 100%);">
+    <div class="star-field" id="uniStars"></div>
+    <svg class="constellation-canvas" id="constSvg" style="z-index:1;"></svg>
+    <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-6 w-full max-w-sm"
+      style="position:relative;z-index:2;">
+      <div class="anim-fadeUp s1">
+        <div class="star-map-container">
+          <canvas id="starMap"></canvas>
+          <div class="overlay-ring"></div>
+        </div>
+      </div>
+      <h2 class="font-outfit font-bold text-2xl text-center anim-fadeUp s2">O Universo Estava<br>Alinhado</h2>
+      <p class="text-center text-sm anim-fadeUp s3" style="color:rgba(255,255,255,0.5);">23 de Dezembro de 2023, Lagoa
+        Santa. As constelações conspiraram para que nos encontrássemos.</p>
+      <div class="glass p-5 w-full anim-fadeUp s4">
+        <div class="flex items-center justify-center gap-4">
+          <svg width="32" height="32" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="#0a1128" />
+            <circle cx="30" cy="40" r="2" fill="#fff" />
+            <circle cx="50" cy="30" r="3" fill="#fff" />
+            <circle cx="70" cy="60" r="2" fill="#fff" />
+            <path d="M 30 40 L 50 30 L 70 60" stroke="#fff" stroke-width="1" fill="none" opacity="0.6"/>
+          </svg>
+          <div>
+            <p class="font-outfit font-semibold text-sm">Céu Noturno</p>
+            <p class="text-xs" style="color:rgba(255,255,255,0.5);">Estrelas de 23/12/2023</p>
+          </div>
+        </div>
+      </div>
+      <p class="font-caveat text-center anim-fadeUp s5" style="font-size:20px;color:rgba(255,255,255,0.4);">As
+        constelações desenharam nosso destino ✨</p>
+      <button class="btn btn-p anim-fadeUp s6" onclick="goTo(5)">Continuar →</button>
+    </div>
+  </section>
+
+  <!-- ===== 5 — WORDLE (SORRISO) ===== -->
+  <section class="screen" id="s-5" style="background: linear-gradient(170deg, #1a100a 0%, #120a06 30%, #0a0806 55%, #050508 100%);">
+    <div class="flex flex-col items-center justify-center min-h-screen px-5 py-14 gap-3 w-full max-w-sm">
+      <div class="text-3xl anim-fadeUp s1">💝</div>
+      <h2 class="font-outfit font-bold text-xl text-center anim-fadeUp s2">Algo que amo em você</h2>
+      <p class="text-center text-xs anim-fadeUp s3" style="color:rgba(255,255,255,0.4);">Descubra a palavra de 7 letras
+        para continuar</p>
+      <div class="flex flex-col gap-2 anim-fadeUp s4" id="wordleGrid"></div>
+      <div id="wordleMsg" class="text-center font-outfit font-bold text-sm" style="min-height:24px;color:#1DB954;">
+      </div>
+      <div class="flex flex-col gap-1 w-full anim-fadeUp s5" id="keyboard"></div>
+      <button class="btn btn-g anim-fadeUp s6" id="wordleNext" onclick="goTo(6)" disabled>🔒 Acerte para
+        continuar</button>
+    </div>
+  </section>
+
+  <!-- ===== 6 — NOSSA JORNADA ===== -->
+  <section class="screen" id="s-6" style="background: linear-gradient(175deg, #12101f 0%, #0c0a18 30%, #080810 55%, #050508 100%);">
+    <div class="flex flex-col items-center px-5 py-16 gap-4 w-full max-w-sm" style="min-height:100vh;">
+      <h2 class="font-outfit font-bold text-2xl text-center anim-fadeUp s1">Nossa Jornada</h2>
+      <p class="text-center anim-fadeUp s2" style="color:rgba(255,255,255,0.4);font-size:13px;">Cada momento que nos
+        trouxe até aqui.</p>
+      <div class="tl-container anim-fadeUp s3">
+        <div class="tl-entry" data-r>
+          <div class="tl-date">Dezembro 2023</div>
+          <div class="tl-text">Nos conhecemos em Lagoa Santa ✨ O destino nos colocou no mesmo caminho.</div>
+          <div class="polaroid p1"><img src="foto2.jpg" alt="">
+            <div class="hw">O início de tudo 💫</div>
+          </div>
+        </div>
+        <div class="tl-entry" data-r>
+          <div class="tl-date">Janeiro 2024</div>
+          <div class="tl-text">Oficialmente juntos! 💜 O melhor "sim" que já existiu.</div>
+          <div class="polaroid p2"><img src="foto7.jpg" alt="">
+            <div class="hw">Eu te amo! ❤️</div>
+          </div>
+        </div>
+        <div class="tl-entry" data-r>
+          <div class="tl-date">2024</div>
+          <div class="tl-text">Passeios, aventuras e muitas risadas juntos. 💛💚</div>
+          <div class="polaroid p3"><img src="foto4.png" alt=""
+              onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#a855f7,#ff4d8d)';this.parentElement.style.minHeight='160px';">
+            <div class="hw">Amo estar ao seu lado ✨</div>
+          </div>
+        </div>
+        <div class="tl-entry" data-r>
+          <div class="tl-date">Viagem à praia</div>
+          <div class="tl-text">O pôr do sol mais lindo ao lado da pessoa mais linda. 🌅</div>
+          <div class="polaroid p4"><img src="foto3.jpg" alt="">
+            <div class="hw">Pôr do sol perfeito 🌅</div>
+          </div>
+        </div>
+        <div class="tl-entry" data-r>
+          <div class="tl-date">Réveillon</div>
+          <div class="tl-text">Virada do ano juntos, fogos e um beijo que vale por mil. 🎆💜</div>
+          <div class="polaroid p5"><img src="foto5.png" alt="">
+            <div class="hw">Pra sempre nós dois 💜</div>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-3 mt-4 pb-8">
+        <button class="btn btn-o" onclick="goTo(5)">← Voltar</button>
+        <button class="btn btn-g" onclick="goTo(7)">Continuar →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 7 — MAPA ===== -->
+  <section class="screen" id="s-7" style="background: linear-gradient(165deg, #0a1a0d 0%, #081208 30%, #060d06 55%, #050508 100%);">
+    <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-5 w-full max-w-sm">
+      <div class="text-4xl anim-fadeUp s1">📍</div>
+      <h2 class="font-outfit font-bold text-2xl text-center anim-fadeUp s2">Nossos Lugares</h2>
+      <p class="text-center text-sm anim-fadeUp s3" style="color:rgba(255,255,255,0.5);">Todos os lugares que marcaram
+        nossa história</p>
+      <div class="anim-fadeUp s4 w-full">
+        <div id="mapContainer"></div>
+      </div>
+      <div class="glass p-4 w-full anim-fadeUp s5">
+        <div class="flex items-center gap-3 mb-3"><span style="font-size:20px;">💜</span>
+          <div>
+            <p class="font-outfit font-semibold text-sm">Lagoa Santa, MG</p>
+            <p class="text-xs" style="color:rgba(255,255,255,0.5);">Onde tudo começou — 23/12/2023</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 mb-3"><span style="font-size:20px;">🏖️</span>
+          <div>
+            <p class="font-outfit font-semibold text-sm">Guarapari, ES</p>
+            <p class="text-xs" style="color:rgba(255,255,255,0.5);">Praia e pôr do sol juntos</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3"><span style="font-size:20px;">🌴</span>
+          <div>
+            <p class="font-outfit font-semibold text-sm">Porto Seguro, BA</p>
+            <p class="text-xs" style="color:rgba(255,255,255,0.5);">Paraíso a dois</p>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-g anim-fadeUp s6" onclick="goTo(8)">Continuar →</button>
+    </div>
+  </section>
+
+  <!-- ===== 8 — PHOTO STACK ===== -->
+  <section class="screen" id="s-8" style="background: linear-gradient(160deg, #1a0a1c 0%, #120818 30%, #0a060f 55%, #050508 100%);">
+    <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-5 w-full max-w-sm">
+      <h2 class="font-outfit font-bold text-2xl text-center anim-fadeUp s1">Nossos Momentos 📸</h2>
+      <p class="text-center text-sm anim-fadeUp s2" style="color:rgba(255,255,255,0.5);">Toque para ver a próxima foto
+      </p>
+      <div class="photo-stack anim-fadeUp s3" id="photoStack"></div>
+      <p class="font-caveat text-center anim-fadeUp s4" style="font-size:18px;color:rgba(255,255,255,0.4);"
+        id="stackCounter">1 / 6</p>
+      <button class="btn btn-r anim-fadeUp s5" onclick="goTo(9)">Continuar →</button>
+    </div>
+  </section>
+
+  <!-- ===== 9 — SAUDADES ===== -->
+  <section class="screen" id="s-9" style="background: linear-gradient(170deg, #18082a 0%, #100618 30%, #080510 55%, #050508 100%);">
+    <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-6 w-full max-w-sm">
+      <h2 class="font-outfit font-bold text-xl text-center anim-fadeUp s1">Saudades de momentos 😊</h2>
+      <p class="text-center text-sm anim-fadeUp s2" style="color:rgba(255,255,255,0.6);line-height:1.7;">Muitos momentos
+        bons e eu queria que fossem eternos. Cada lembrança com você é um tesouro. 💚</p>
+      <div class="anim-fadeUp s3" style="width:100%;"><img src="foto3.jpg" alt="" class="sec-img"
+          style="max-height:380px;"></div>
+      <p class="font-caveat text-center anim-fadeUp s4" style="font-size:22px;color:rgba(255,255,255,0.5);">"Que saudade
+        de viver tudo de novo..." 💜</p>
+      <button class="btn btn-r anim-fadeUp s5" onclick="goTo(10)">Ver mais →</button>
+    </div>
+  </section>
+
+  <!-- ===== 10 — QUE CASAL LINDO ===== -->
+  <section class="screen" id="s-10" style="background: linear-gradient(165deg, #0f1a10 0%, #0a120a 30%, #060d06 55%, #050508 100%);">
+    <div class="flex flex-col items-center min-h-screen px-6 py-16 gap-4 w-full max-w-sm">
+      <h2 class="font-outfit font-bold text-xl text-center anim-fadeUp s1">Que casal lindo! 😍</h2>
+      <p class="anim-fadeUp s2" style="color:rgba(255,255,255,0.4);font-size:13px;">(só isso mesmo)</p>
+      <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:10px;width:100%;" class="anim-fadeUp s3">
+        <div class="gal-item"><img src="foto1.jpg" alt=""
+            onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#7c3aed,#e63946)'">
+        </div>
+        <div class="gal-item"><img src="foto2.jpg" alt=""
+            onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#1DB954,#00d4ff)'">
+        </div>
+        <div class="gal-item"><img src="foto6.jpg" alt=""
+            onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#e63946,#ff6b6b)'">
+        </div>
+        <div class="gal-item"><img src="foto3.jpg" alt=""
+            onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#ff6b6b,#7c3aed)'">
+        </div>
+        <div class="gal-item"><img src="foto4.png" alt=""
+            onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#a855f7,#ff4d8d)'">
+        </div>
+        <div class="gal-item"><img src="foto5.png" alt=""
+            onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#0d9e3f,#00d4ff)'">
+        </div>
+      </div>
+      <p class="font-caveat text-center anim-fadeUp s6" style="font-size:20px;color:rgba(255,255,255,0.5);">Cada foto
+        conta uma parte da nossa história ✨</p>
+      <button class="btn btn-g anim-fadeUp s7" onclick="goTo(11)">Próximo →</button>
+    </div>
+  </section>
+
+  <!-- ===== 11 — ROLETA ===== -->
+  <section class="screen" id="s-11" style="background: linear-gradient(160deg, #1c0f1c 0%, #140a18 30%, #0c080f 55%, #050508 100%);">
+    <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-5 w-full max-w-sm">
+      <div class="text-4xl anim-fadeUp s1">🎰</div>
+      <h2 class="font-outfit font-bold text-xl text-center anim-fadeUp s2">Roleta de Encontros</h2>
+      <p class="text-center text-sm anim-fadeUp s3" style="color:rgba(255,255,255,0.5);">Gire a roleta e descubra nosso
+        próximo programa!</p>
+      <div class="wheel-wrap anim-fadeUp s4">
+        <div class="wheel-ptr">▼</div><canvas id="wheelCanvas" class="wheel-canvas" width="260" height="260"></canvas>
+      </div>
+      <button class="btn btn-r anim-fadeUp s5" id="spinBtn" onclick="spinWheel()">🎲 Girar!</button>
+      <div class="wheel-result glass p-5 w-full" id="wheelRes">
+        <p class="font-outfit font-bold text-lg text-center" id="wheelResTxt"></p>
+        <p class="font-caveat text-center mt-2" style="font-size:18px;color:rgba(255,255,255,0.5);">Bora marcar? 💜</p>
+      </div>
+      <button class="btn btn-g anim-fadeUp s6" onclick="goTo(12)">Próximo →</button>
+    </div>
+  </section>
+
+  <!-- ===== 12 — CONQUISTA ===== -->
+  <section class="screen" id="s-12" style="background: linear-gradient(170deg, #100a30 0%, #0a0820 30%, #060515 55%, #050508 100%);">
+    <div class="flex flex-col items-center justify-center min-h-screen px-6 py-16 gap-5 w-full max-w-sm">
+      <div class="text-4xl anim-fadeUp s1">🏆</div>
+      <h2 class="font-outfit font-bold text-xl text-center anim-fadeUp s2">Conquista Desbloqueada!</h2>
+      <p class="text-center text-sm anim-fadeUp s3" style="color:rgba(255,255,255,0.5);">Toque no card para virar</p>
+      <div class="holo-card-container anim-fadeUp s4" onclick="flipCard()">
+        <div class="holo-card" id="holoCard">
+          <div class="holo-face holo-front">
+            <div class="holo-shimmer"></div>
+            <div class="holo-badge">🏆</div>
+            <p class="font-outfit font-bold text-lg mt-4">Conquista Rara</p>
+            <p class="text-sm mt-1" style="color:rgba(255,255,255,0.5);">Toque para revelar</p>
+          </div>
+          <div class="holo-face holo-back">
+            <div class="holo-shimmer"></div>
+            <p style="font-size:48px;margin-bottom:12px;">💜</p>
+            <p class="font-outfit font-bold text-lg text-center">Melhor Casal<br>do Universo</p>
+            <p class="font-caveat text-center mt-3" style="font-size:20px;color:rgba(255,255,255,0.6);">Gabriel & Ester
+            </p>
+            <p class="text-xs mt-3" style="color:rgba(255,255,255,0.3);">Desde 14/01/2024 • Nível Máximo</p>
+            <div class="flex gap-1 mt-3"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-g anim-fadeUp s5" onclick="goTo(13)">Ver final →</button>
+    </div>
+  </section>
+
+  <!-- ===== 13 — FINAL ===== -->
+  <section class="screen" id="s-13" style="background: linear-gradient(180deg, #0a0510 0%, #050308 50%, #020204 100%);">
+    <div class="final-bg" style="background-image:url('foto5.png');" id="finalBg"></div>
+    <div class="final-content flex flex-col items-center justify-center min-h-screen px-8 gap-6"
+      style="position:relative;z-index:10;">
+      <div class="anim-fadeUp s1" style="font-size:48px;">💜</div>
+      <h2 class="font-outfit font-bold text-3xl text-center anim-fadeUp s2"
+        style="text-shadow:0 2px 20px rgba(0,0,0,0.5);">Pra sempre, nós dois.</h2>
+      <p class="text-center anim-fadeUp s3"
+        style="color:rgba(255,255,255,0.8);font-size:15px;line-height:1.8;text-shadow:0 1px 8px rgba(0,0,0,0.5);max-width:320px;">
+        Você é a lua da minha vida. Cada dia ao seu lado é uma página do melhor livro que já existiu. Obrigado por ser
+        meu mundo. Eu te amo. 💜</p>
+      <div class="font-caveat anim-fadeUp s4"
+        style="font-size:28px;color:rgba(255,255,255,0.6);text-shadow:0 1px 8px rgba(0,0,0,0.5);">— Gabriel 💌</div>
+      <div class="flex flex-col gap-3 w-full max-w-xs anim-fadeUp s5">
+        <button class="btn btn-r w-full justify-center" onclick="shareStory()">📤 Compartilhar</button>
+        <button class="btn btn-o w-full justify-center" onclick="goTo(0)">↩ Voltar ao Início</button>
+      </div>
+    </div>
+    <div id="confettiLayer" style="position:fixed;inset:0;pointer-events:none;z-index:300;"></div>
+  </section>
+
+  <script>
+    // ===== CONFIG =====
+    const C = { n1: 'Gabriel', n2: 'Ester', start: new Date('2024-01-14T00:00:00-03:00'), met: new Date('2023-12-23T00:00:00-03:00') };
+    const TOTAL = 14;
+    let cur = 0, transitioning = false, mapInit = false, uniInit = false;
+
+    document.getElementById('names').textContent = C.n1 + ' e ' + C.n2;
+
+    // ===== DOTS =====
+    const dotsC = document.getElementById('dotsC');
+    for (let i = 0; i < TOTAL; i++) { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsC.appendChild(d); }
+    function updateDots(i) { dotsC.querySelectorAll('.dot').forEach((d, j) => { d.className = 'dot'; if (j === i) d.classList.add('active'); }); }
+
+    // ===== NAVIGATION =====
+    function goTo(i) {
+      if (transitioning || i === cur || i < 0 || i >= TOTAL) return;
+      // Block leaving wordle if not solved
+      if (cur === 5 && !wDone && i > cur) return;
+      transitioning = true;
+      const fwd = i > cur, old = document.getElementById('s-' + cur), nw = document.getElementById('s-' + i);
+      nw.querySelectorAll('.anim-fadeUp').forEach(el => { el.style.animation = 'none'; el.offsetHeight; el.style.animation = ''; });
+      if (fwd) { nw.style.transform = 'translateX(30px)'; old.classList.add('exiting'); }
+      else { nw.style.transform = 'translateX(-30px)'; old.style.opacity = '0'; old.style.transform = 'translateX(30px)'; }
+      old.classList.remove('active');
+      setTimeout(() => {
+        old.classList.remove('exiting'); old.style.display = 'none'; old.style.opacity = ''; old.style.transform = '';
+        nw.style.display = ''; nw.style.transform = ''; nw.classList.add('active');
+        cur = i; updateDots(i); transitioning = false; nw.scrollTop = 0;
+        if (i === 3) initWrapped();
+        if (i === 4) initUniverse();
+        if (i === 5) initWordle();
+        if (i === 6) initTimeline();
+        if (i === 7 && !mapInit) initMap();
+        if (i === 8) initPhotoStack();
+        if (i === 13) launchConfetti();
+      }, 500);
+    }
+
+    // Swipe
+    let tx = 0, ty = 0;
+    document.addEventListener('touchstart', e => { tx = e.changedTouches[0].screenX; ty = e.changedTouches[0].screenY; }, { passive: true });
+    document.addEventListener('touchend', e => {
+      if (e.target.closest('#photoStack') || e.target.closest('#map') || e.target.closest('#wheelCanvas')) return;
+      const dx = e.changedTouches[0].screenX - tx, dy = e.changedTouches[0].screenY - ty;
+      if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy)) return;
+      dx < 0 ? goTo(cur + 1) : goTo(cur - 1);
+    }, { passive: true });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(cur + 1);
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goTo(cur - 1);
+    });
+
+    // ===== TIMER =====
+    function updateTimer() {
+      const now = new Date();
+      let y = now.getFullYear() - C.start.getFullYear(), m = now.getMonth() - C.start.getMonth(), d = now.getDate() - C.start.getDate();
+      if (d < 0) { m--; d += new Date(now.getFullYear(), now.getMonth(), 0).getDate(); }
+      if (m < 0) { y--; m += 12; }
+      document.getElementById('sA').textContent = y; document.getElementById('sM').textContent = m; document.getElementById('sD').textContent = d;
+      document.getElementById('sH').textContent = now.getHours(); document.getElementById('sMi').textContent = now.getMinutes(); document.getElementById('sS').textContent = now.getSeconds();
+    }
+    updateTimer(); setInterval(updateTimer, 1000);
+
+    // ===== AUDIO =====
+    const audio = document.getElementById('audioPlayer');
+    function toggleAudio() {
+      const pSvg = '<svg width="28" height="28" viewBox="0 0 24 24" fill="black"><path d="M8 5v14l11-7z"/></svg>';
+      const psSvg = '<svg width="28" height="28" viewBox="0 0 24 24" fill="black"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+      if (audio.paused) {
+        audio.play().then(() => { document.getElementById('playIcon').innerHTML = psSvg; document.getElementById('floatAudio').classList.add('playing'); }).catch(() => { });
+      } else { audio.pause(); document.getElementById('playIcon').innerHTML = pSvg; document.getElementById('floatAudio').classList.remove('playing'); }
+    }
+    audio.addEventListener('timeupdate', () => { if (audio.duration) { document.getElementById('progFill').style.width = (audio.currentTime / audio.duration) * 100 + '%'; const m = Math.floor(audio.currentTime / 60), s = Math.floor(audio.currentTime % 60); document.getElementById('curTime').textContent = m + ':' + (s < 10 ? '0' : '') + s; } });
+    audio.addEventListener('ended', () => { audio.currentTime = 0; audio.play(); });
+    document.getElementById('progBar').addEventListener('click', e => { if (audio.duration) { const r = e.currentTarget.getBoundingClientRect(); audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration; } });
+
+    // ===== WRAPPED =====
+    let wrInit = false;
+    function initWrapped() {
+      if (wrInit) return; wrInit = true;
+      const days = Math.floor((Date.now() - C.start.getTime()) / 86400000);
+      animateCount('wrDays', days, 2000);
+      animateCount('wrHours', days * 24, 2500);
+    }
+    function animateCount(id, target, dur) {
+      const el = document.getElementById(id); let start = 0;
+      const step = ts => { if (!start) start = ts; const p = Math.min((ts - start) / dur, 1); el.textContent = Math.floor(p * target).toLocaleString(); if (p < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    }
+
+    // ===== UNIVERSE =====
+    function initUniverse() {
+      if (uniInit) return; uniInit = true;
+      const field = document.getElementById('uniStars');
+      const vw = window.innerWidth, vh = window.innerHeight;
+
+      // Tiny background stars scattered everywhere
+      for (let i = 0; i < 60; i++) {
+        const s = document.createElement('div'); s.className = 'star';
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top = Math.random() * 100 + '%';
+        const sz = 0.5 + Math.random() * 1.2;
+        s.style.width = sz + 'px'; s.style.height = sz + 'px';
+        s.style.animationDelay = Math.random() * 5 + 's';
+        s.style.animationDuration = (3 + Math.random() * 4) + 's';
+        field.appendChild(s);
+      }
+
+      // Define constellation groups positioned around the edges
+      // Each group: { stars: [{x%, y%}], connections: [[i,j]], color }
+      const constellations = [
+        { // Bottom-left: a small triangle/sail shape
+          stars: [
+            {x: 5, y: 78}, {x: 12, y: 65}, {x: 20, y: 75},
+            {x: 15, y: 85}, {x: 28, y: 82}
+          ],
+          connections: [[0,1],[1,2],[2,3],[3,0],[2,4]]
+        },
+        { // Bottom-right: a zigzag / Cassiopeia-like
+          stars: [
+            {x: 70, y: 80}, {x: 78, y: 72}, {x: 82, y: 82},
+            {x: 90, y: 75}, {x: 95, y: 83}
+          ],
+          connections: [[0,1],[1,2],[2,3],[3,4]]
+        },
+        { // Top-right: a small diamond
+          stars: [
+            {x: 85, y: 15}, {x: 90, y: 25}, {x: 95, y: 15},
+            {x: 90, y: 8}
+          ],
+          connections: [[0,1],[1,2],[2,3],[3,0]]
+        },
+        { // Left side: little dipper-like
+          stars: [
+            {x: 2, y: 30}, {x: 8, y: 25}, {x: 14, y: 28},
+            {x: 12, y: 35}, {x: 6, y: 38}
+          ],
+          connections: [[0,1],[1,2],[2,3],[3,4],[4,0]]
+        },
+        { // Bottom-center: a gentle arc
+          stars: [
+            {x: 35, y: 90}, {x: 42, y: 85}, {x: 50, y: 88},
+            {x: 58, y: 85}, {x: 65, y: 90}
+          ],
+          connections: [[0,1],[1,2],[2,3],[3,4]]
+        },
+        { // Right side mid: small cross
+          stars: [
+            {x: 92, y: 45}, {x: 88, y: 50}, {x: 92, y: 55},
+            {x: 96, y: 50}
+          ],
+          connections: [[0,1],[1,2],[0,3],[3,2]]
+        }
+      ];
+
+      const svg = document.getElementById('constSvg');
+      svg.setAttribute('width', vw);
+      svg.setAttribute('height', vh);
+
+      let lineDelay = 0;
+      constellations.forEach((group, gi) => {
+        // Map % coords to pixel positions
+        const pts = group.stars.map(s => ({
+          x: s.x * vw / 100,
+          y: s.y * vh / 100
+        }));
+
+        // Draw constellation stars as bright glowing dots
+        group.stars.forEach((s, si) => {
+          const dot = document.createElement('div'); dot.className = 'star';
+          dot.style.left = s.x + '%'; dot.style.top = s.y + '%';
+          dot.style.width = '3px'; dot.style.height = '3px';
+          dot.style.background = '#fff';
+          dot.style.boxShadow = '0 0 3px 1px rgba(180,200,255,0.4)';
+          dot.style.animationDelay = (gi * 0.5 + si * 0.2) + 's';
+          dot.style.animationDuration = (2.5 + Math.random() * 2) + 's';
+          dot.style.zIndex = '3';
+          field.appendChild(dot);
+        });
+
+        // Draw constellation lines
+        group.connections.forEach(([a, b], li) => {
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', pts[a].x); line.setAttribute('y1', pts[a].y);
+          line.setAttribute('x2', pts[b].x); line.setAttribute('y2', pts[b].y);
+          line.setAttribute('stroke', 'rgba(160,190,255,0.25)');
+          line.setAttribute('stroke-width', '1');
+          line.setAttribute('stroke-linecap', 'round');
+          const len = Math.hypot(pts[b].x - pts[a].x, pts[b].y - pts[a].y);
+          line.setAttribute('stroke-dasharray', len);
+          line.setAttribute('stroke-dashoffset', len);
+          line.style.animation = `constellationDraw 1.5s ease forwards`;
+          line.style.animationDelay = (lineDelay + li * 0.3) + 's';
+          svg.appendChild(line);
+        });
+
+        lineDelay += group.connections.length * 0.15 + 0.3;
+      });
+
+      // Shooting star effect
+      function createShootingStar() {
+        const star = document.createElement('div');
+        star.className = 'shooting-star';
+        star.style.left = (10 + Math.random() * 60) + '%';
+        star.style.top = (5 + Math.random() * 30) + '%';
+        star.style.animation = `shootingStar ${1 + Math.random() * 0.5}s linear forwards`;
+        field.appendChild(star);
+        setTimeout(() => star.remove(), 2000);
+      }
+      // First shooting star after a delay, then occasional ones
+      setTimeout(createShootingStar, 3000);
+      setInterval(() => { if (cur === 4) createShootingStar(); }, 5000 + Math.random() * 5000);
+    }
+
+    // ===== WORDLE =====
+    const WORD = 'SORRISO';
+    const WLEN = 7;
+    let wRow = 0, wCol = 0, wDone = false, wInit = false;
+    function initWordle() {
+      if (wInit) return; wInit = true;
+      const grid = document.getElementById('wordleGrid');
+      for (let r = 0; r < 6; r++) {
+        const row = document.createElement('div'); row.className = 'wordle-row'; row.id = 'wr-' + r;
+        for (let c = 0; c < WLEN; c++) {
+          const cell = document.createElement('div'); cell.className = 'wordle-cell'; cell.id = 'wc-' + r + '-' + c;
+          if (r === 0 && c === 0) cell.classList.add('active');
+          row.appendChild(cell);
+        }
+        grid.appendChild(row);
+      }
+      const rows = [['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'], ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'], ['⏎', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '⌫']];
+      const kb = document.getElementById('keyboard');
+      rows.forEach(r => {
+        const row = document.createElement('div'); row.className = 'flex gap-1 justify-center';
+        r.forEach(k => {
+          const btn = document.createElement('button'); btn.className = 'kb-key'; btn.textContent = k; btn.id = 'kb-' + k;
+          btn.onclick = () => handleKey(k);
+          row.appendChild(btn);
+        });
+        kb.appendChild(row);
+      });
+      document.addEventListener('keydown', e => {
+        if (cur !== 4 || wDone) return;
+        if (e.key === 'Enter') handleKey('⏎');
+        else if (e.key === 'Backspace') handleKey('⌫');
+        else if (/^[a-zA-Z]$/.test(e.key)) handleKey(e.key.toUpperCase());
+      });
+    }
+    function handleKey(k) {
+      if (wDone || wRow >= 6) return;
+      if (k === '⌫') {
+        if (wCol > 0) { wCol--; const c = document.getElementById('wc-' + wRow + '-' + wCol); c.textContent = ''; c.classList.remove('filled'); c.classList.add('active'); }
+      } else if (k === '⏎') {
+        if (wCol < WLEN) return;
+        let guess = '';
+        for (let i = 0; i < WLEN; i++) guess += document.getElementById('wc-' + wRow + '-' + i).textContent;
+        for (let i = 0; i < WLEN; i++) {
+          const cell = document.getElementById('wc-' + wRow + '-' + i), l = guess[i], kb = document.getElementById('kb-' + l);
+          setTimeout(() => {
+            if (l === WORD[i]) { cell.classList.add('correct'); if (kb) kb.classList.add('correct'); }
+            else if (WORD.includes(l)) { cell.classList.add('present'); if (kb && !kb.classList.contains('correct')) kb.classList.add('present'); }
+            else { cell.classList.add('absent'); if (kb) kb.classList.add('absent'); }
+          }, i * 150);
+        }
+        setTimeout(() => {
+          if (guess === WORD) {
+            wDone = true;
+            document.getElementById('wordleMsg').innerHTML = '🎉 Isso! O seu <b>SORRISO</b>! 💜';
+            const btn = document.getElementById('wordleNext');
+            btn.disabled = false;
+            btn.textContent = 'Continuar →';
+          } else if (wRow >= 5) {
+            // Reveal answer but don't let them proceed — reset
+            document.getElementById('wordleMsg').innerHTML = 'Era <b>SORRISO</b>! Tente de novo 💜';
+            setTimeout(() => resetWordle(), 2500);
+          } else {
+            // Shake the row
+            document.getElementById('wr-' + wRow).classList.add('wordle-shake');
+            setTimeout(() => document.getElementById('wr-' + wRow).classList.remove('wordle-shake'), 500);
+            wRow++; wCol = 0;
+            if (wRow < 6) document.getElementById('wc-' + wRow + '-0').classList.add('active');
+          }
+        }, WLEN * 150 + 300);
+      } else {
+        if (wCol >= WLEN) return;
+        const c = document.getElementById('wc-' + wRow + '-' + wCol);
+        c.textContent = k; c.classList.remove('active'); c.classList.add('filled');
+        wCol++;
+        if (wCol < WLEN) document.getElementById('wc-' + wRow + '-' + wCol).classList.add('active');
+      }
+    }
+    function resetWordle() {
+      wRow = 0; wCol = 0;
+      document.getElementById('wordleMsg').textContent = '';
+      for (let r = 0; r < 6; r++) {
+        for (let c = 0; c < WLEN; c++) {
+          const cell = document.getElementById('wc-' + r + '-' + c);
+          cell.textContent = ''; cell.className = 'wordle-cell';
+        }
+      }
+      document.getElementById('wc-0-0').classList.add('active');
+      // Reset keyboard colors
+      document.querySelectorAll('.kb-key').forEach(k => { k.classList.remove('correct', 'present', 'absent'); });
+    }
+
+    // ===== TIMELINE =====
+    function initTimeline() {
+      document.querySelectorAll('.tl-entry').forEach((e, i) => setTimeout(() => e.classList.add('visible'), 200 + i * 300));
+    }
+
+    // ===== MAP =====
+    function initMap() {
+      try {
+      mapInit = true;
+      const places = [
+        { lat: -19.6322, lng: -43.8891, name: 'Lagoa Santa', desc: 'Onde tudo começou 💜', emoji: '💜' },
+        { lat: -20.6731, lng: -40.4997, name: 'Guarapari', desc: 'Praia e pôr do sol 🌅', emoji: '🏖️' },
+        { lat: -16.4435, lng: -39.0643, name: 'Porto Seguro', desc: 'Paraíso a dois 🌴', emoji: '🌴' },
+      ];
+      const container = document.getElementById('mapContainer');
+      container.style.height = '250px';
+      container.style.width = '100%';
+      container.innerHTML = '';
+      const map = L.map('mapContainer', { zoomControl: false, attributionControl: false }).setView([-18.5, -41.0], 6);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+      places.forEach(p => {
+        const icon = L.divIcon({ html: '<div style="font-size:28px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));">' + p.emoji + '</div>', className: '', iconSize: [28, 28], iconAnchor: [14, 28] });
+        L.marker([p.lat, p.lng], { icon }).addTo(map).bindPopup('<div style="text-align:center;font-family:Outfit,sans-serif;"><b>' + p.name + '</b><br>' + p.desc + '</div>');
+      });
+      L.polyline(places.map(p => [p.lat, p.lng]), { color: '#1DB954', weight: 2, opacity: 0.5, dashArray: '8 8' }).addTo(map);
+      setTimeout(() => map.invalidateSize(), 100);
+      setTimeout(() => map.invalidateSize(), 500);
+      setTimeout(() => map.invalidateSize(), 1500);
+      } catch(e) { console.error('Map init error:', e); }
+    }
+
+    // ===== PHOTO STACK =====
+    const stackPhotos = [
+      { src: 'foto1.jpg', caption: 'Nós dois ❤️' },
+      { src: 'foto2.jpg', caption: 'Noite mágica ✨' },
+      { src: 'foto3.jpg', caption: 'Pôr do sol 🌅' },
+      { src: 'foto4.png', caption: 'Passeio 💛' },
+      { src: 'foto5.png', caption: 'Réveillon 🎆' },
+      { src: 'foto6.jpg', caption: 'Nós 💜' },
+    ];
+    let stackIdx = 0, stackInit = false;
+    function initPhotoStack() {
+      if (stackInit) return; stackInit = true;
+      const container = document.getElementById('photoStack');
+      stackPhotos.forEach((p, i) => {
+        const card = document.createElement('div'); card.className = 'stack-card';
+        card.style.zIndex = stackPhotos.length - i;
+        card.style.transform = 'scale(' + (1 - i * 0.04) + ') translateY(' + (i * 8) + 'px)';
+        if (i > 0) card.style.opacity = Math.max(0.3, 1 - i * 0.2);
+        card.innerHTML = '<img src="' + p.src + '" alt=""><div class="card-caption">' + p.caption + '</div>';
+
+        let startX = 0, currentX = 0, isDragging = false;
+        card.addEventListener('pointerdown', (e) => {
+          if (i !== stackIdx) return;
+          isDragging = true; startX = e.clientX; currentX = 0;
+          card.style.transition = 'none';
+          card.setPointerCapture(e.pointerId);
+        });
+        card.addEventListener('pointermove', (e) => {
+          if (!isDragging) return;
+          currentX = e.clientX - startX;
+          card.style.transform = `scale(1) translateY(0px) translateX(${currentX}px) rotate(${currentX * 0.05}deg)`;
+        });
+        const endDrag = (e) => {
+          if (!isDragging) return;
+          isDragging = false;
+          card.releasePointerCapture(e.pointerId);
+          card.style.transition = 'transform .5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity .4s';
+          if (Math.abs(currentX) > 80) nextCard(Math.sign(currentX));
+          else card.style.transform = 'scale(1) translateY(0px)';
+        };
+        card.addEventListener('pointerup', endDrag);
+        card.addEventListener('pointercancel', endDrag);
+
+        container.appendChild(card);
+      });
+      document.getElementById('s-8').querySelector('p.text-sm').textContent = 'Arraste para os lados para passar a foto';
+    }
+    function nextCard(dir = -1) {
+      const cards = document.querySelectorAll('.stack-card');
+      if (stackIdx >= cards.length) return;
+      cards[stackIdx].style.transform = `translateX(${dir * 150}%) rotate(${dir * 20}deg)`;
+      cards[stackIdx].style.opacity = '0';
+      stackIdx++;
+      document.getElementById('stackCounter').textContent = Math.min(stackIdx + 1, cards.length) + ' / ' + cards.length;
+      cards.forEach((c, i) => { if (i >= stackIdx) { const o = i - stackIdx; c.style.transform = 'scale(' + (1 - o * 0.04) + ') translateY(' + (o * 8) + 'px)'; c.style.opacity = Math.max(0.3, 1 - o * 0.2); c.style.zIndex = cards.length - o; } });
+      if (stackIdx >= cards.length) setTimeout(() => { stackIdx = 0; cards.forEach((c, i) => { c.style.transform = 'scale(' + (1 - i * 0.04) + ') translateY(' + (i * 8) + 'px)'; c.style.opacity = i === 0 ? '1' : Math.max(0.3, 1 - i * 0.2); c.style.zIndex = cards.length - i; }); document.getElementById('stackCounter').textContent = '1 / ' + cards.length; }, 800);
+    }
+
+    // ===== WHEEL =====
+    const wOpts = ['Jantar', 'Cinema', 'Piquenique', 'Praia', 'Trilha', 'Sorvete', 'Café', 'Parque'];
+    const wClrs = ['#e63946', '#1DB954', '#7c3aed', '#ff6b6b', '#0d9e3f', '#a855f7', '#ff4d8d', '#4f46e5'];
+    let spinning = false, wAngle = 0;
+    function drawWheel() {
+      const cv = document.getElementById('wheelCanvas'); if (!cv) return;
+      const ctx = cv.getContext('2d'), cx = 130, cy = 130, r = 120, sa = (2 * Math.PI) / wOpts.length;
+      ctx.clearRect(0, 0, 260, 260);
+      wOpts.forEach((o, i) => {
+        const s = wAngle + i * sa, e = s + sa;
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, s, e); ctx.closePath();
+        ctx.fillStyle = wClrs[i]; ctx.fill();
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.save(); ctx.translate(cx, cy); ctx.rotate(s + sa / 2);
+        ctx.textAlign = 'right'; ctx.fillStyle = '#fff'; ctx.font = 'bold 11px Outfit,sans-serif';
+        ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 2;
+        ctx.fillText(o, r - 10, 4); ctx.restore();
+      });
+      ctx.beginPath(); ctx.arc(cx, cy, 18, 0, 2 * Math.PI); ctx.fillStyle = '#1a1a1a'; ctx.fill();
+    }
+    function spinWheel() {
+      if (spinning) return; spinning = true;
+      document.getElementById('spinBtn').textContent = '🎰 Girando...';
+      document.getElementById('wheelRes').classList.remove('show');
+      const winIdx = Math.floor(Math.random() * wOpts.length);
+      const sa = (2 * Math.PI) / wOpts.length;
+      const baseTarget = -Math.PI / 2 - winIdx * sa - sa / 2;
+      const fullSpins = (12 + Math.floor(Math.random() * 5)) * 2 * Math.PI;
+      const tA = baseTarget + fullSpins;
+      const sA = wAngle;
+      const dur = 4000, st = performance.now();
+      function anim(now) {
+        const p = Math.min((now - st) / dur, 1), e = 1 - Math.pow(1 - p, 3);
+        wAngle = sA + (tA - sA) * e; drawWheel();
+        if (p < 1) requestAnimationFrame(anim);
+        else {
+          spinning = false; wAngle = tA; drawWheel();
+          document.getElementById('wheelResTxt').textContent = '🎉 ' + wOpts[winIdx] + '!';
+          document.getElementById('wheelRes').classList.add('show');
+          document.getElementById('spinBtn').textContent = '🎲 Girar de novo!';
+        }
+      }
+      requestAnimationFrame(anim);
+    }
+    setTimeout(drawWheel, 100);
+
+    // ===== CONQUISTA =====
+    function flipCard() { document.getElementById('holoCard').classList.toggle('flipped'); }
+
+    // ===== CONFETTI =====
+    function launchConfetti() {
+      const l = document.getElementById('confettiLayer'); l.innerHTML = '';
+      const clrs = ['#e63946', '#1DB954', '#ff6b6b', '#7c3aed', '#ff4d8d', '#ffd700', '#00d4ff'];
+      for (let i = 0; i < 60; i++) {
+        const p = document.createElement('div'); p.className = 'confetti-piece';
+        p.style.left = Math.random() * 100 + 'vw'; p.style.background = clrs[Math.floor(Math.random() * clrs.length)];
+        p.style.animationDelay = Math.random() * 2 + 's'; p.style.animationDuration = (2 + Math.random() * 2) + 's';
+        p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        p.style.width = (4 + Math.random() * 8) + 'px'; p.style.height = p.style.width;
+        l.appendChild(p);
+      }
+      setTimeout(() => l.innerHTML = '', 5000);
+    }
+
+    // ===== SHARE =====
+    function shareStory() {
+      if (navigator.share) { navigator.share({ title: 'Nossa História 💜', text: C.n1 + ' e ' + C.n2, url: location.href }).catch(() => { }); }
+      else { navigator.clipboard.writeText(location.href).then(() => { const b = event.target; const o = b.textContent; b.textContent = '✅ Copiado!'; setTimeout(() => b.textContent = o, 2000); }).catch(() => { }); }
+    }
+  </script>
+  <script src="script.js"></script>
+</body>
+
+</html>

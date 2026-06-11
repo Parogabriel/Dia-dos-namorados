@@ -1,0 +1,102 @@
+:root {
+    --bg-color: #03050a;
+    --text-color: #ffffff;
+    --accent-color: #a0c4ff;
+    --ring-color: rgba(255, 255, 255, 0.15);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+#bgCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    z-index: 10;
+    width: 100%;
+    max-width: 600px;
+}
+
+.names {
+    font-family: 'Dancing Script', cursive;
+    font-size: 3.5rem;
+    margin-bottom: 2.5rem;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+    letter-spacing: 2px;
+}
+
+.star-map-container {
+    position: relative;
+    width: 320px;
+    height: 320px;
+    margin-bottom: 2.5rem;
+    border-radius: 50%;
+    box-shadow: 0 0 50px rgba(160, 196, 255, 0.05);
+}
+
+#starMap {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, #0a1128 0%, #03050a 100%);
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+.overlay-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 1px solid var(--ring-color);
+    pointer-events: none;
+}
+
+.details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.quote {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.location, .date, .coordinates {
+    font-size: 0.75rem;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+}
